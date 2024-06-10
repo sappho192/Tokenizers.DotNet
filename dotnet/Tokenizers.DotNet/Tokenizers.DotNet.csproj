@@ -4,6 +4,56 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Tokenizers.DotNet</Title>
+    <Authors>sappho192</Authors>
+    <Description>.NET wrapper of HuggingFace Tokenizers library</Description>
+    <PackageProjectUrl>https://github.com/sappho192/Tokenizers.DotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sappho192/Tokenizers.DotNet.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>tokenizers;rust;huggingface;tokenizer;gpt</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NuspecFile>Tokenizers.DotNet.nuspec</NuspecFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="deps\hf_tokenizers.dll" />
+    <None Remove="deps\hf_tokenizers.dll.exp" />
+    <None Remove="deps\hf_tokenizers.dll.lib" />
+    <None Remove="hf_tokenizers.dll" />
+    <None Remove="hf_tokenizers.dll.exp" />
+    <None Remove="hf_tokenizers.dll.lib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="hf_tokenizers.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="hf_tokenizers.dll.exp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="hf_tokenizers.dll.lib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="csbindgen" Version="1.9.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="RelaxVersioner" Version="3.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>
