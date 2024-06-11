@@ -8,7 +8,7 @@ var filePath = "tokenizer.json";
 var fileFullPath = await HuggingFace.GetFileFromHub(hubName, filePath, "deps");
 Console.WriteLine($"Downloaded {fileFullPath}");
 
-// Write the path of tokenizer.json to deps/tokenizer.path.txt
+// Write the path of tokenizer.json to tokenizer.path.txt
 var tokenizerPath = "tokenizer.path.txt";
 await File.WriteAllTextAsync(tokenizerPath, fileFullPath);
 Console.WriteLine($"Wrote {fileFullPath} to {tokenizerPath}");
