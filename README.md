@@ -5,6 +5,7 @@
 - [How to use](#how-to-use)
   - [(1) Install the packages](#1-install-the-packages)
   - [(2) Write the code](#2-write-the-code)
+- [How to build](#how-to-build)
 
 # Tokenizers.DotNet
 
@@ -57,3 +58,15 @@ var tokens = new uint[] { 9330, 387, 12857, 9376, 18649, 9098, 7656, 6969, 8084,
 var decoded = tokenizer.Decode(tokens);
 Console.WriteLine($"Decoded: {decoded}");
 ```
+
+# How to build
+
+1. Prepare following stuff:
+   1.  Rust build system (`cargo`)
+   2.  .NET build system (`dotnet 6.0`)
+   3.  PowerShell (Recommend `7.4.2` or above)
+2. Run `build_all_clean.ps1`
+   1. To build `Tokenizers.DotNet.runtime.win` only, run `build_rust.ps1`
+   2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
+
+Each build artifacts will be in `nuget` directory.  
