@@ -15,8 +15,8 @@
 
 | Package                       | main                                                                                                              | Description                     |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| Tokenizers.DotNet             | ![Nuget Tokenizers.DotNet](https://img.shields.io/nuget/v/Tokenizers.DotNet.svg?style=flat)                         | Core library                    |
-| Tokenizers.DotNet.runtime.win | ![Nuget Tokenizers.DotNet.runtime.win](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win.svg?style=flat) | Native bindings for windows x64 |
+| Tokenizers.DotNet             | [![Nuget Tokenizers.DotNet](https://img.shields.io/nuget/v/Tokenizers.DotNet.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet/)                         | Core library                    |
+| Tokenizers.DotNet.runtime.win | [![Nuget Tokenizers.DotNet.runtime.win](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win/) | Native bindings for windows x64 |
 
 # Requirements
 
