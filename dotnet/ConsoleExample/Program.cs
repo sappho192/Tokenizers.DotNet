@@ -18,4 +18,5 @@ var tokenizer = new Tokenizer();
 var tokens = new uint[] { 9330, 387, 12857, 9376, 18649, 9098, 7656, 6969, 8084, 1 };
 var decoded = tokenizer.Decode(tokens);
 Console.WriteLine($"Decoded: {decoded}");
+//Console.WriteLine($"Version: {tokenizer.GetVersion()}");
 

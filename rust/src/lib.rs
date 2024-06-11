@@ -142,3 +142,11 @@ pub unsafe extern "C" fn tokenizer_decode(buffer: *const u32, len: i32) -> *mut 
     let buf = ByteBuffer::from_vec(str.into_bytes());
     Box::into_raw(Box::new(buf))
 }
+
+// #[no_mangle]
+// pub unsafe extern "C" fn get_version() -> *mut ByteBuffer {
+//     const VERSION: &str = env!("CARGO_PKG_VERSION");
+//     // Copy VERSION to new String
+//     let buf = ByteBuffer::from_vec(VERSION.to_string().into_bytes());
+//     Box::into_raw(Box::new(buf))
+// }

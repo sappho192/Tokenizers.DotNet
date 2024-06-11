@@ -14,7 +14,7 @@ namespace CsBindgen
     {
         const string __DllName = "hf_tokenizers";
 
-         
+
 
         [DllImport(__DllName, EntryPoint = "alloc_u8_string", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern ByteBuffer* alloc_u8_string();

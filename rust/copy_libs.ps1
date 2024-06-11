@@ -1,9 +1,15 @@
 $sourceFiles = @(
-    "target/debug/hf_tokenizers.dll",
-    "target/debug/hf_tokenizers.dll.exp",
-    "target/debug/hf_tokenizers.dll.lib"
+    "target/debug/hf_tokenizers.dll"
 )
-$destinationPath = "../dotnet/Tokenizers.DotNet/deps/"
+
+if ($IsWindows) {
+    $destinationPath = "../nuget/win-x64/"
+}
+else {
+    Write-Output "Unsupported OS"
+    exit
+}
+
 
 if (-not (Test-Path -Path $destinationPath)) {
     New-Item -Path $destinationPath -ItemType Directory
@@ -16,4 +22,5 @@ else {
 # Copy each file to the destination, overwriting existing files
 foreach ($file in $sourceFiles) {
     Copy-Item -Path $file -Destination $destinationPath -Force
+    Write-Output "Copied $file to $destinationPath"
 }
