@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>tokenizers;rust;huggingface;tokenizer;gpt</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <!-- <NuspecFile>Tokenizers.DotNet.nuspec</NuspecFile> -->
+    <NuspecFile>Tokenizers.DotNet.nuspec</NuspecFile>
   </PropertyGroup>
 
   <ItemGroup>
