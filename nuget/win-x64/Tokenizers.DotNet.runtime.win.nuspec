@@ -14,10 +14,6 @@
     <description>Native(Rust) wrapper of HuggingFace Tokenizers library. Only for personal use.</description>
     <copyright>Copyright (c) Taein Kim(sappho192)</copyright>
     <tags>tokenizers;rust;huggingface;tokenizer;gpt</tags>
-    <dependencies>
-        <group targetFramework="net6.0"></group>
-        <group targetFramework="net8.0"></group>
-    </dependencies>
   </metadata>
   <files>
     <file src="hf_tokenizers.dll" target="runtimes\win-x64\native" />
