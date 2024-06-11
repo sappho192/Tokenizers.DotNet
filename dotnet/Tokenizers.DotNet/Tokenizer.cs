@@ -10,7 +10,7 @@ namespace Tokenizers.DotNet
             string result = string.Empty;
             unsafe
             {
-                Console.WriteLine($"Input tokens: {string.Join(", ", tokens)}");
+                // Console.WriteLine($"Input tokens: {string.Join(", ", tokens)}");
                 fixed (uint* p = tokens)
                 {
                     var decoded = NativeMethods.tokenizer_decode(p, tokens.Length);
@@ -45,7 +45,7 @@ namespace Tokenizers.DotNet
         //            NativeMethods.free_u8_string(versionBytes);
         //        }
         //    }
-            
+
         //    return result;
         //}
     }
