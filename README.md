@@ -2,7 +2,9 @@
 - [Nuget Package list](#nuget-package-list)
 - [Requirements](#requirements)
 - [Supported functionalities](#supported-functionalities)
-- [Example](#example)
+- [How to use](#how-to-use)
+  - [(1) Install the packages](#1-install-the-packages)
+  - [(2) Write the code](#2-write-the-code)
 
 # Tokenizers.DotNet
 
@@ -25,7 +27,14 @@
 * [X] Load tokenizer file(`.json`) from local
 * [X] Decode embeddings to string
 
-# Example
+# How to use
+
+## (1) Install the packages
+
+1. From the NuGet, install `Tokenizers.DotNet` package
+2. And then, install `Tokenizers.DotNet.runtime.win` package too
+
+## (2) Write the code
 
 Check following example code:
 
