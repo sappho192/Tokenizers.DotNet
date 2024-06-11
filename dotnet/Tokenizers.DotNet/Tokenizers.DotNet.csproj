@@ -1,9 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Tokenizers.DotNet</Title>
+    <Authors>sappho192</Authors>
+    <Description>.NET wrapper of HuggingFace Tokenizers library</Description>
+    <PackageProjectUrl>https://github.com/sappho192/Tokenizers.DotNet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sappho192/Tokenizers.DotNet.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>tokenizers;rust;huggingface;tokenizer;gpt</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- <NuspecFile>Tokenizers.DotNet.nuspec</NuspecFile> -->
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="csbindgen" Version="1.9.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="RelaxVersioner" Version="3.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Tokenizers.DotNet.runtime.win" Version="0.2.0" />
+  </ItemGroup>
 
 </Project>
