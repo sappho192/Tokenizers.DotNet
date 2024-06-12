@@ -108,21 +108,50 @@ pub unsafe extern "C" fn csharp_to_rust_u32_array(buffer: *const u32, len: i32) 
 }
 
 // Tokenizer stuff starts here
-use lazy_static::lazy_static;
-use std::fs::File;
-use std::io::Read;
+use once_cell::sync::OnceCell;
+use std::fmt;
 use tokenizers::tokenizer::Tokenizer;
 
-// Initialize the tokenizer
-lazy_static! {
-    static ref TOKENIZER: Tokenizer = {
-        // Read the file path from the text file
-        let mut file = File::open("tokenizer.path.txt").expect("Failed to find tokenizer.path.txt file");
-        let mut path = String::new();
-        file.read_to_string(&mut path).expect("Failed to read tokenizer.path.txt file");
+#[repr(C)]
+pub struct TokenizerInfo {
+    pub tokenizer_path: String,  // path to tokenizer.json
+    pub library_version: String, // From cargo.toml
+}
 
-        Tokenizer::from_file(path).unwrap()
+impl fmt::Debug for TokenizerInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "TokenizerInfo {{ tokenizer_path: {}, library_version: {} }}",
+            self.tokenizer_path, self.library_version
+        )
+    }
+}
+
+static GLOBAL_TOKENIZER: OnceCell<Tokenizer> = OnceCell::new();
+static GLOBAL_TOKENIZER_INFO: OnceCell<TokenizerInfo> = OnceCell::new();
+
+#[no_mangle]
+pub unsafe extern "C" fn tokenizer_initialize(utf16_path: *const u16, utf16_path_len: i32) {
+    // Initialize the GLOBAL_TOKENIZER_INFO
+    let slice = std::slice::from_raw_parts(utf16_path, utf16_path_len as usize);
+    let utf8_path = String::from_utf16(slice).unwrap();
+
+    let version = env!("CARGO_PKG_VERSION");
+    let info = TokenizerInfo {
+        tokenizer_path: utf8_path.clone(),
+        library_version: version.to_string(),
     };
+    GLOBAL_TOKENIZER_INFO
+        .set(info)
+        .expect("Failed to set GLOBAL_TOKENIZER_INFO");
+
+    // Initialize the GLOBAL_TOKENIZER
+    let path = utf8_path.clone();
+    let tokenizer = Tokenizer::from_file(&path).unwrap();
+    GLOBAL_TOKENIZER
+        .set(tokenizer)
+        .expect("Failed to set GLOBAL_TOKENIZER");
 }
 
 // Returns u8string. Caller must free the memory
@@ -131,7 +160,8 @@ pub unsafe extern "C" fn tokenizer_decode(buffer: *const u32, len: i32) -> *mut 
     let slice = std::slice::from_raw_parts(buffer, len as usize);
     // let vec = slice.to_vec();
     // println!("{:?}", vec);
-    let decoded = TOKENIZER.decode(slice, true);
+    let tokenizer = GLOBAL_TOKENIZER.get().unwrap();
+    let decoded = tokenizer.decode(slice, true);
     if decoded.is_err() {
         // return empty string
         return Box::into_raw(Box::new(ByteBuffer::from_vec(vec![])));

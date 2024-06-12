@@ -5,6 +5,20 @@ namespace Tokenizers.DotNet
 {
     public class Tokenizer
     {
+        private Tokenizer() { }
+
+        public Tokenizer(string vocabPath)
+        {
+            unsafe
+            {
+                fixed (char* p = vocabPath)
+                {
+                    NativeMethods.tokenizer_initialize((ushort*)p, vocabPath.Length);
+                }
+            }
+        }
+
+
         public string Decode(uint[] tokens)
         {
             string result = string.Empty;
