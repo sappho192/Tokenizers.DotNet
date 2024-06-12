@@ -1,5 +1,5 @@
 $sourceFiles = @(
-    "target/debug/hf_tokenizers.dll"
+    "target/release/hf_tokenizers.dll"
 )
 
 if ($IsWindows) {
