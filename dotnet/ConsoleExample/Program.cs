@@ -1,7 +1,5 @@
 ﻿using Tokenizers.DotNet;
 
-Console.WriteLine("Hello, World!");
-
 // Download skt/kogpt2-base-v2/tokenizer.json from the hub
 var hubName = "skt/kogpt2-base-v2";
 var filePath = "tokenizer.json";
@@ -13,5 +11,6 @@ var tokenizer = new Tokenizer(vocabPath: fileFullPath);
 var tokens = new uint[] { 9330, 387, 12857, 9376, 18649, 9098, 7656, 6969, 8084, 1 };
 var decoded = tokenizer.Decode(tokens);
 Console.WriteLine($"Decoded: {decoded}");
-//Console.WriteLine($"Version: {tokenizer.GetVersion()}");
+
+Console.WriteLine($"Version of Tokenizers.DotNet.runtime.win: {tokenizer.GetVersion()}");
 

@@ -173,10 +173,9 @@ pub unsafe extern "C" fn tokenizer_decode(buffer: *const u32, len: i32) -> *mut 
     Box::into_raw(Box::new(buf))
 }
 
-// #[no_mangle]
-// pub unsafe extern "C" fn get_version() -> *mut ByteBuffer {
-//     const VERSION: &str = env!("CARGO_PKG_VERSION");
-//     // Copy VERSION to new String
-//     let buf = ByteBuffer::from_vec(VERSION.to_string().into_bytes());
-//     Box::into_raw(Box::new(buf))
-// }
+#[no_mangle]
+pub unsafe extern "C" fn get_version() -> *mut ByteBuffer {
+    let version = GLOBAL_TOKENIZER_INFO.get().unwrap().library_version.clone();
+    let buf = ByteBuffer::from_vec(version.into_bytes());
+    Box::into_raw(Box::new(buf))
+}

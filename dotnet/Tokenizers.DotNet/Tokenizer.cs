@@ -43,24 +43,24 @@ namespace Tokenizers.DotNet
             return result;
         }
 
-        //public string GetVersion()
-        //{
-        //    string result = string.Empty;
-        //    unsafe
-        //    {
-        //        var versionBytes = NativeMethods.get_version();
-        //        try
-        //        {
-        //            var str = Encoding.UTF8.GetString(versionBytes->AsSpan());
-        //            result = new string(str);
-        //        }
-        //        finally
-        //        {
-        //            NativeMethods.free_u8_string(versionBytes);
-        //        }
-        //    }
+        public string GetVersion()
+        {
+            string result = string.Empty;
+            unsafe
+            {
+                var versionBytes = NativeMethods.get_version();
+                try
+                {
+                    var str = Encoding.UTF8.GetString(versionBytes->AsSpan());
+                    result = new string(str);
+                }
+                finally
+                {
+                    NativeMethods.free_u8_string(versionBytes);
+                }
+            }
 
-        //    return result;
-        //}
+            return result;
+        }
     }
 }

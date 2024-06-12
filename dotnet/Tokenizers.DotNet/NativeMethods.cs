@@ -34,6 +34,9 @@ namespace CsBindgen
         [DllImport(__DllName, EntryPoint = "tokenizer_decode", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern ByteBuffer* tokenizer_decode(uint* buffer, int len);
 
+        [DllImport(__DllName, EntryPoint = "get_version", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern ByteBuffer* get_version();
+
 
     }
 
