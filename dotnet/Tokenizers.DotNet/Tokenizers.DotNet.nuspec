@@ -15,9 +15,16 @@
     <copyright>Copyright (c) Taein Kim(sappho192)</copyright>
     <tags>tokenizers;rust;huggingface;tokenizer;gpt</tags>
     <readme>docs\README.md</readme>
+    <dependencies>
+      <group targetFramework="net6.0"></group>
+      <group targetFramework="net7.0"></group>
+      <group targetFramework="net8.0"></group>
+    </dependencies>
   </metadata>
   <files>
     <file src="..\..\README.md" target="docs\" />
     <file src="bin\$Configuration$\net6.0\**\*.*" target="lib/net6.0" />
+    <file src="bin\$Configuration$\net7.0\**\*.*" target="lib/net7.0" />
+    <file src="bin\$Configuration$\net8.0\**\*.*" target="lib/net8.0" />
   </files>
 </package>
