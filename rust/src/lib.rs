@@ -108,14 +108,17 @@ pub unsafe extern "C" fn csharp_to_rust_u32_array(buffer: *const u32, len: i32) 
 }
 
 // Tokenizer stuff starts here
-use once_cell::sync::OnceCell;
+use once_cell::unsync::Lazy;
+use std::collections::HashMap;
 use std::fmt;
 use tokenizers::tokenizer::Tokenizer;
+use uuid::Uuid;
 
 #[repr(C)]
 pub struct TokenizerInfo {
     pub tokenizer_path: String,  // path to tokenizer.json
     pub library_version: String, // From cargo.toml
+    pub tokenizer_id: String,    // Session ID(UUID) of the tokenizer
 }
 
 impl fmt::Debug for TokenizerInfo {
@@ -128,54 +131,93 @@ impl fmt::Debug for TokenizerInfo {
     }
 }
 
-static GLOBAL_TOKENIZER: OnceCell<Tokenizer> = OnceCell::new();
-static GLOBAL_TOKENIZER_INFO: OnceCell<TokenizerInfo> = OnceCell::new();
+static mut TOKENIZER_SESSION: Lazy<HashMap<String, TokenizerInfo>> = Lazy::new(|| HashMap::new());
+
+static mut TOKENIZER_DB: Lazy<HashMap<String, Tokenizer>> = Lazy::new(|| HashMap::new());
 
 #[no_mangle]
-pub unsafe extern "C" fn tokenizer_initialize(utf16_path: *const u16, utf16_path_len: i32) {
+pub unsafe extern "C" fn tokenizer_initialize(
+    utf16_path: *const u16,
+    utf16_path_len: i32,
+) -> *mut ByteBuffer {
     // Initialize the GLOBAL_TOKENIZER_INFO
     let slice = std::slice::from_raw_parts(utf16_path, utf16_path_len as usize);
     let utf8_path = String::from_utf16(slice).unwrap();
+
+    let id = Uuid::new_v4().to_string();
+    // println!("Session ID: {}", id);
 
     let version = env!("CARGO_PKG_VERSION");
     let info = TokenizerInfo {
         tokenizer_path: utf8_path.clone(),
         library_version: version.to_string(),
+        tokenizer_id: id.clone(),
     };
-    GLOBAL_TOKENIZER_INFO
-        .set(info)
-        .expect("Failed to set GLOBAL_TOKENIZER_INFO");
 
-    // Initialize the GLOBAL_TOKENIZER
+    // Add to TOKENIZER_SESSION
+    TOKENIZER_SESSION.insert(id.clone(), info);
+
+    // Initialize TOKENIZER_DB if not already initialized
     let path = utf8_path.clone();
     let tokenizer = Tokenizer::from_file(&path).unwrap();
-    GLOBAL_TOKENIZER
-        .set(tokenizer)
-        .expect("Failed to set GLOBAL_TOKENIZER");
+    TOKENIZER_DB.insert(id.clone(), tokenizer);
+
+    let session_id = id.clone();
+    Box::into_raw(Box::new(ByteBuffer::from_vec(session_id.into_bytes())))
 }
 
 // Returns u8string. Caller must free the memory
 #[no_mangle]
-pub unsafe extern "C" fn tokenizer_decode(buffer: *const u32, len: i32) -> *mut ByteBuffer {
-    let slice = std::slice::from_raw_parts(buffer, len as usize);
-    // let vec = slice.to_vec();
-    // println!("{:?}", vec);
-    let tokenizer = GLOBAL_TOKENIZER.get().unwrap();
-    let decoded = tokenizer.decode(slice, true);
-    if decoded.is_err() {
-        // return empty string
-        return Box::into_raw(Box::new(ByteBuffer::from_vec(vec![])));
-    }
-    let str = decoded.unwrap();
-    // println!("{:?}", str);
+pub unsafe extern "C" fn tokenizer_decode(
+    _session_id: *const u16,
+    _session_id_len: i32,
+    _token_ids: *const u32,
+    _token_ids_len: i32,
+) -> *mut ByteBuffer {
+    let slice_session_id = std::slice::from_raw_parts(_session_id, _session_id_len as usize);
+    let session_id = String::from_utf16(slice_session_id).unwrap();
+    let slice_token_ids = std::slice::from_raw_parts(_token_ids, _token_ids_len as usize);
+    let token_ids_vec: Vec<u32> = slice_token_ids.iter().copied().collect();
 
-    let buf = ByteBuffer::from_vec(str.into_bytes());
+    // Retrieve the tokenizer associated with the session ID
+    let tokenizer = TOKENIZER_DB
+        .get(&session_id)
+        .cloned()
+        .unwrap_or_else(|| panic!("Tokenizer for session ID '{}' not found.", session_id));
+
+    // Decode the tokens
+    let decoded_result = tokenizer.decode(&token_ids_vec, true);
+    let decoded_text = match decoded_result {
+        Ok(decoded) => decoded,
+        Err(e) => {
+            eprintln!("Error decoding tokens: {:?}", e);
+            return Box::into_raw(Box::new(ByteBuffer::from_vec(vec![]))); // Return empty string on error
+        }
+    };
+
+    // Convert the decoded text to bytes and return as ByteBuffer
+    let buf = ByteBuffer::from_vec(decoded_text.into_bytes());
     Box::into_raw(Box::new(buf))
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn get_version() -> *mut ByteBuffer {
-    let version = GLOBAL_TOKENIZER_INFO.get().unwrap().library_version.clone();
+pub unsafe extern "C" fn get_version(
+    _session_id: *const u16,
+    _session_id_len: i32,
+) -> *mut ByteBuffer {
+    let slice_session_id = std::slice::from_raw_parts(_session_id, _session_id_len as usize);
+    let session_id = String::from_utf16(slice_session_id).unwrap();
+
+    // Retrieve the TokenizerInfo associated with the session ID
+    let session_info = TOKENIZER_SESSION
+        .get(&session_id)
+        .clone()
+        .unwrap_or_else(|| panic!("Session info for session ID '{}' not found.", session_id));
+
+    // Get the library version from the TokenizerInfo
+    let version = session_info.library_version.clone();
+
+    // Convert the version string to bytes and return as ByteBuffer
     let buf = ByteBuffer::from_vec(version.into_bytes());
     Box::into_raw(Box::new(buf))
 }

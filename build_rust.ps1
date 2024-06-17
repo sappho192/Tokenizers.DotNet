@@ -6,7 +6,7 @@ Write-Output "Version: $version"
 # Step 2: Replace the version in Cargo.toml
 $cargoTomlPath = ".\rust\Cargo.toml"
 $cargoContent = Get-Content -Path $cargoTomlPath
-$cargoContent = $cargoContent -replace '(?<=version\s*=\s*")[^"]*', $version
+$cargoContent = $cargoContent -replace '(?<=^version\s*=\s*")[^"]*', $version
 Set-Content -Path $cargoTomlPath -Value $cargoContent
 Write-Output "Updated version in Cargo.toml"
 
