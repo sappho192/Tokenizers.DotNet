@@ -29,13 +29,13 @@ namespace CsBindgen
         public static extern void csharp_to_rust_u32_array(uint* buffer, int len);
 
         [DllImport(__DllName, EntryPoint = "tokenizer_initialize", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void tokenizer_initialize(ushort* utf16_path, int utf16_path_len);
+        public static extern ByteBuffer* tokenizer_initialize(ushort* utf16_path, int utf16_path_len);
 
         [DllImport(__DllName, EntryPoint = "tokenizer_decode", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern ByteBuffer* tokenizer_decode(uint* buffer, int len);
+        public static extern ByteBuffer* tokenizer_decode(ushort* _session_id, int _session_id_len, uint* _token_ids, int _token_ids_len);
 
         [DllImport(__DllName, EntryPoint = "get_version", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern ByteBuffer* get_version();
+        public static extern ByteBuffer* get_version(ushort* _session_id, int _session_id_len);
 
 
     }

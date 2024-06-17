@@ -6,6 +6,7 @@ namespace Tokenizers.DotNet
     public class Tokenizer
     {
         private Tokenizer() { }
+        private readonly string sessionId;
 
         public Tokenizer(string vocabPath)
         {
@@ -13,7 +14,16 @@ namespace Tokenizers.DotNet
             {
                 fixed (char* p = vocabPath)
                 {
-                    NativeMethods.tokenizer_initialize((ushort*)p, vocabPath.Length);
+                    var session_id = NativeMethods.tokenizer_initialize((ushort*)p, vocabPath.Length);
+                    try
+                    {
+                        var str = Encoding.UTF8.GetString(session_id->AsSpan());
+                        sessionId = new string(str);
+                    }
+                    finally
+                    {
+                        NativeMethods.free_u8_string(session_id);
+                    }
                 }
             }
         }
@@ -27,15 +37,20 @@ namespace Tokenizers.DotNet
                 // Console.WriteLine($"Input tokens: {string.Join(", ", tokens)}");
                 fixed (uint* p = tokens)
                 {
-                    var decoded = NativeMethods.tokenizer_decode(p, tokens.Length);
-                    try
+                    fixed (char* cp = sessionId)
                     {
-                        var str = Encoding.UTF8.GetString(decoded->AsSpan());
-                        result = new string(str);
-                    }
-                    finally
-                    {
-                        NativeMethods.free_u8_string(decoded);
+                        var decoded = NativeMethods.tokenizer_decode(
+                            (ushort*)cp, sessionId.Length,
+                            p, tokens.Length);
+                        try
+                        {
+                            var str = Encoding.UTF8.GetString(decoded->AsSpan());
+                            result = new string(str);
+                        }
+                        finally
+                        {
+                            NativeMethods.free_u8_string(decoded);
+                        }
                     }
                 }
             }
@@ -48,15 +63,18 @@ namespace Tokenizers.DotNet
             string result = string.Empty;
             unsafe
             {
-                var versionBytes = NativeMethods.get_version();
-                try
+                fixed(char* cp = sessionId)
                 {
-                    var str = Encoding.UTF8.GetString(versionBytes->AsSpan());
-                    result = new string(str);
-                }
-                finally
-                {
-                    NativeMethods.free_u8_string(versionBytes);
+                    var versionBytes = NativeMethods.get_version((ushort*)cp, sessionId.Length);
+                    try
+                    {
+                        var str = Encoding.UTF8.GetString(versionBytes->AsSpan());
+                        result = new string(str);
+                    }
+                    finally
+                    {
+                        NativeMethods.free_u8_string(versionBytes);
+                    }
                 }
             }
 
