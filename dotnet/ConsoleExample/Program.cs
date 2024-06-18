@@ -8,24 +8,31 @@ Console.WriteLine($"Downloaded {fileFullPath}");
 
 // Create a tokenizer instance
 var tokenizer = new Tokenizer(vocabPath: fileFullPath);
-var tokens = new uint[] { 9330, 387, 12857, 9376, 18649, 9098, 7656, 6969, 8084, 1 };
+var text = "음, 이제 식사도 해볼까요";
+Console.WriteLine($"Input text: {text}");
+var tokens = tokenizer.Encode(text);
+Console.WriteLine($"Encoded: {string.Join(", ", tokens)}");
 var decoded = tokenizer.Decode(tokens);
 Console.WriteLine($"Decoded: {decoded}");
 
 Console.WriteLine($"Version of Tokenizers.DotNet.runtime.win: {tokenizer.GetVersion()}");
 
-// Download openai-community/gpt2 from the hub
+Console.WriteLine("--------------------------------------------------");
+
+//// Download openai-community/gpt2 from the hub
 hubName = "openai-community/gpt2";
 filePath = "tokenizer.json";
 fileFullPath = await HuggingFace.GetFileFromHub(hubName, filePath, "deps");
 
 // Create a tokenizer instance
 var tokenizer2 = new Tokenizer(vocabPath: fileFullPath);
-var tokens2 = new uint[] { 72, 373, 10927, 878, 262, 2814, 11, 290, 1312, 550, 257, 17372, 13 };
+var text2 = "i was nervous before the exam, and i had a fever.";
+Console.WriteLine($"Input text: {text2}");
+var tokens2 = tokenizer2.Encode(text2);
+Console.WriteLine($"Encoded: {string.Join(", ", tokens2)}");
 var decoded2 = tokenizer2.Decode(tokens2);
 Console.WriteLine($"Decoded: {decoded2}");
 
 Console.WriteLine($"Version of Tokenizers.DotNet.runtime.win: {tokenizer2.GetVersion()}");
 Console.ReadKey();
-
 
