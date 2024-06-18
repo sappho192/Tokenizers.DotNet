@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>Tokenizers.DotNet</Title>
     <Authors>sappho192</Authors>
     <Description>.NET wrapper of HuggingFace Tokenizers library</Description>
@@ -14,7 +14,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>tokenizers;rust;huggingface;tokenizer;gpt</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <NuspecFile>Tokenizers.DotNet.nuspec</NuspecFile>
+    <!-- <NuspecFile>Tokenizers.DotNet.nuspec</NuspecFile> -->
   </PropertyGroup>
 
   <ItemGroup>

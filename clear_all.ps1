@@ -9,8 +9,21 @@ if (Test-Path -Path "hf_tokenizers.dll") {
 }
 
 Set-Location -Path ".."
-if (Test-Path -Path "Tokenizers.DotNet.*") {
-    Remove-Item "Tokenizers.DotNet.*" -Force
+if (Test-Path -Path "Tokenizers.DotNet.*.nupkg") {
+    Remove-Item "Tokenizers.DotNet.*.nupkg" -Force
 }
 
+if (Test-Path -Path "net*") {
+    Remove-Item "net*" -Force
+}
+Pop-Location
+
+Push-Location
+Set-Location -Path ".\dotnet\Tokenizers.DotNet"
+if (Test-Path -Path ".\bin") {
+    Remove-Item "bin" -Force -Recurse
+}
+if (Test-Path -Path ".\obj") {
+    Remove-Item "obj" -Force -Recurse
+}
 Pop-Location
