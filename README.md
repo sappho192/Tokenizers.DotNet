@@ -26,7 +26,8 @@
 
 * [X] Download tokenizer files from Hugginface Hub
 * [X] Load tokenizer file(`.json`) from local
-* [X] Decode embeddings to string
+* [X] Encode string to tokens
+* [X] Decode tokens to string
 
 # How to use
 
