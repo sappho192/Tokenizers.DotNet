@@ -2,7 +2,8 @@ name: Build (Windows)
 
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - '*'
   pull_request:
     branches: [ "main" ]
 
@@ -36,7 +37,7 @@ jobs:
     - name: 'Artifacts'
       uses: actions/upload-artifact@v4
       with:
-        name: my-artifact
+        name: Built packages
         path: |
           nuget/win-x64/Tokenizers.DotNet.runtime.win.*.nupkg
           nuget/Tokenizers.DotNet.*.nupkg
