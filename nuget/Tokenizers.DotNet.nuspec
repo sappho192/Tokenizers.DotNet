@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Tokenizers.DotNet</id>
+    <version>1.0.1</version>
+    <title>Tokenizers.DotNet</title>
+    <authors>sappho192</authors>
+    <owners>sappho192</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/sappho192/Tokenizers.DotNet</projectUrl>
+    <repository type="git" url="https://github.com/sappho192/Tokenizers.DotNet.git" branch="$RepositoryBranch$" commit="$RepositoryCommit$" />
+    <description>.NET wrapper of HuggingFace Tokenizers library</description>
+    <copyright>Copyright (c) Taein Kim(sappho192)</copyright>
+    <tags>tokenizers;rust;huggingface;tokenizer;gpt</tags>
+    <readme>docs\README.md</readme>
+    <dependencies>
+      <group targetFramework="net6.0"></group>
+      <group targetFramework="net7.0"></group>
+      <group targetFramework="net8.0"></group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\README.md" target="docs\" />
+    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net6.0\**\*.*" target="lib/net6.0" />
+    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net7.0\**\*.*" target="lib/net7.0" />
+    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net8.0\**\*.*" target="lib/net8.0" />
+  </files>
+</package>
