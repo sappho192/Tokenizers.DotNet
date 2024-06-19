@@ -1,4 +1,4 @@
-name: Build
+name: Build (Windows)
 
 on:
   push:
@@ -33,3 +33,10 @@ jobs:
       shell: pwsh
       run: |
         .\build_dotnet.ps1
+    - name: 'Artifacts'
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-artifact
+        path: |
+          nuget/win-x64/Tokenizers.DotNet.runtime.win.*.nupkg
+          nuget/Tokenizers.DotNet.*.nupkg
