@@ -29,4 +29,4 @@ if ($LASTEXITCODE -ne 0) {
 Set-Location -Path ".."
 Set-Location -Path "nuget\win-x64"
 nuget pack Tokenizers.DotNet.runtime.win.nuspec
-Set-Location -Path "..\.."
+Pop-Location
