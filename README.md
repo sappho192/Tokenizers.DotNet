@@ -9,7 +9,8 @@
 
 # Tokenizers.DotNet
 
-.NET wrapper of HuggingFace [Tokenizers](https://github.com/huggingface/tokenizers) library
+.NET wrapper of HuggingFace [Tokenizers](https://github.com/huggingface/tokenizers) library  
+![Windows build status](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows.yml/badge.svg)  
 
 # Nuget Package list
 
