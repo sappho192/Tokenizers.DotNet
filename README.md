@@ -9,7 +9,7 @@
 
 # Tokenizers.DotNet
 
-.NET wrapper of HuggingFace Tokenizers library
+.NET wrapper of HuggingFace [Tokenizers](https://github.com/huggingface/tokenizers) library
 
 # Nuget Package list
 
