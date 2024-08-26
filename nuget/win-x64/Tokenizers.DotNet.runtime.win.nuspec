@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Tokenizers.DotNet.runtime.win</id>
-    <version>1.0.1</version>
+    <version>1.0.5</version>
     <title>Tokenizers.DotNet.runtime.win</title>
     <authors>sappho192</authors>
     <owners>sappho192</owners>
@@ -11,7 +11,7 @@
     <!-- <icon>icon.png</icon> -->
     <projectUrl>https://github.com/sappho192/Tokenizers.DotNet</projectUrl>
     <repository type="git" url="https://github.com/sappho192/Tokenizers.DotNet.git" branch="$RepositoryBranch$" commit="$RepositoryCommit$" />
-    <description>Native(Rust) wrapper of HuggingFace Tokenizers library. Only for personal use.</description>
+    <description>Native(Rust) wrapper of HuggingFace Tokenizers library.</description>
     <copyright>Copyright (c) Taein Kim(sappho192)</copyright>
     <tags>tokenizers;rust;huggingface;tokenizer;gpt</tags>
   </metadata>
