@@ -201,6 +201,41 @@ pub unsafe extern "C" fn tokenizer_encode(
     Box::into_raw(Box::new(buf))
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn tokenizer_attention_mask(
+    _session_id: *const u16,
+    _session_id_len: i32,
+    _text: *const u16,
+    _text_len: i32,
+) -> *mut ByteBuffer {
+    let slice_session_id = std::slice::from_raw_parts(_session_id, _session_id_len as usize);
+    let session_id = String::from_utf16(slice_session_id).unwrap();
+    let slice_text = std::slice::from_raw_parts(_text, _text_len as usize);
+    let text = String::from_utf16(slice_text).unwrap();
+
+    // Retrieve the tokenizer associated with the session ID
+    let tokenizer = TOKENIZER_DB
+        .get(&session_id)
+        .cloned()
+        .unwrap_or_else(|| panic!("Tokenizer for session ID '{}' not found.", session_id));
+
+    // Encode the text
+    let encoded_result = tokenizer.encode(text.clone(), true);
+    let encoded_tokens = match encoded_result {
+        Ok(encoded) => encoded,
+        Err(err) => panic!("{}", err),
+    };
+    let token_ids = encoded_tokens
+        .get_attention_mask()
+        .iter()
+        .map(|&i| i as u32)
+        .collect::<Vec<u32>>();
+
+    // Convert the attention mask to a ByteBuffer
+    let buf = ByteBuffer::from_vec_struct(token_ids);
+    Box::into_raw(Box::new(buf))
+}
+
 // Returns u8string. Caller must free the memory
 #[no_mangle]
 pub unsafe extern "C" fn tokenizer_decode(
