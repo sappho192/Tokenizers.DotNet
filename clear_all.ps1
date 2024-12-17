@@ -1,6 +1,14 @@
 Push-Location
 
-Set-Location -Path ".\nuget\win-x64"
+$arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
+    "X64"  { "x64" }
+    "X86"  { "x86" }
+    "Arm"  { "arm" }
+    "Arm64" { "arm64" }
+    Default { "unknown" }
+}
+
+Set-Location -Path ".\nuget\win-$arch"
 if (Test-Path -Path "Tokenizers.DotNet.runtime.win.*.nupkg") {
     Remove-Item "Tokenizers.DotNet.runtime.win.*.nupkg" -Force
 }

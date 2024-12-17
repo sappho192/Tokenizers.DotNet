@@ -2,8 +2,16 @@ $sourceFiles = @(
     "target/release/hf_tokenizers.dll"
 )
 
-if ($IsWindows) {
-    $destinationPath = "../nuget/win-x64/"
+$arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
+    "X64"  { "x64" }
+    "X86"  { "x86" }
+    "Arm"  { "arm" }
+    "Arm64" { "arm64" }
+    Default { "unknown" }
+}
+
+if ($IsWindows -or $ENV:OS) {
+    $destinationPath = "../nuget/win-$arch/"
 }
 else {
     Write-Output "Unsupported OS"
