@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Tokenizers.DotNet.runtime.win" Version="1.0.5" />
+    <PackageReference Include="Tokenizers.DotNet.runtime.win-x64" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
