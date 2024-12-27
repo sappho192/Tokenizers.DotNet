@@ -21,7 +21,7 @@ Set-Content -Path $cargoTomlPath -Value $cargoContent
 Write-Output "Updated version in Cargo.toml"
 
 # Step 3: Replace the version in.nuspec file
-$nuspecFilePath = ".\nuget\win-$arch\Tokenizers.DotNet.runtime.win.nuspec"
+$nuspecFilePath = ".\nuget\win-$arch\Tokenizers.DotNet.runtime.win-$arch.nuspec"
 $nuspecContent = Get-Content -Path $nuspecFilePath
 $nuspecContent = $nuspecContent -replace '(?<=<version>)[^<]*', $version
 Set-Content -Path $nuspecFilePath -Value $nuspecContent
@@ -38,5 +38,5 @@ if ($LASTEXITCODE -ne 0) {
 &.\copy_libs.ps1
 Set-Location -Path ".."
 Set-Location -Path "nuget\win-$arch"
-nuget pack Tokenizers.DotNet.runtime.win.nuspec
+nuget pack Tokenizers.DotNet.runtime.win-$arch.nuspec
 Pop-Location

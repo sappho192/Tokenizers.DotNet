@@ -9,8 +9,8 @@ $arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitect
 }
 
 Set-Location -Path ".\nuget\win-$arch"
-if (Test-Path -Path "Tokenizers.DotNet.runtime.win.*.nupkg") {
-    Remove-Item "Tokenizers.DotNet.runtime.win.*.nupkg" -Force
+if (Test-Path -Path "Tokenizers.DotNet.runtime.win-$arch*.nupkg") {
+    Remove-Item "Tokenizers.DotNet.runtime.win-$arch*.nupkg" -Force
 }
 if (Test-Path -Path "hf_tokenizers.dll") {
     Remove-Item "hf_tokenizers.dll" -Force

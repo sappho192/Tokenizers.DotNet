@@ -1,5 +1,7 @@
 nuget/win-x64/*
-!Tokenizers.DotNet.runtime.win.nuspec
+nuget/win-arm64/*
+!Tokenizers.DotNet.runtime.win-x64.nuspec
+!Tokenizers.DotNet.runtime.win-arm64.nuspec
 nuget/Tokenizers.DotNet.*.nupkg
 
 .vscode/*

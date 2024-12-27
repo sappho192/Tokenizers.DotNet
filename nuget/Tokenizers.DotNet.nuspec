@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Tokenizers.DotNet</id>
-    <version>1.0.5</version>
+    <version>1.1.0</version>
     <title>Tokenizers.DotNet</title>
     <authors>sappho192</authors>
     <owners>sappho192</owners>
@@ -19,6 +19,7 @@
       <group targetFramework="net6.0"></group>
       <group targetFramework="net7.0"></group>
       <group targetFramework="net8.0"></group>
+      <group targetFramework="net9.0"></group>
     </dependencies>
   </metadata>
   <files>
@@ -26,5 +27,6 @@
     <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net6.0\**\*.*" target="lib/net6.0" />
     <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net7.0\**\*.*" target="lib/net7.0" />
     <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net8.0\**\*.*" target="lib/net8.0" />
+    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net9.0\**\*.*" target="lib/net9.0" />
   </files>
 </package>
