@@ -90,7 +90,8 @@ Console.ReadKey();
    1.  Rust build system (`cargo`)
    2.  .NET build system (`dotnet 6.0, 7.0, 8.0, 9.0`)
    3.  PowerShell (Recommend `7.4.2` or above)
-2. Run `build_all_clean.ps1`
+2. Bump the version number in `NATIVE_LIB_VERSION.txt`
+3. Run `build_all_clean.ps1`
    1. To build `Tokenizers.DotNet.runtime.win` only, run `build_rust.ps1`
    2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
 
