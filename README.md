@@ -11,7 +11,7 @@
 
 .NET wrapper of HuggingFace [Tokenizers](https://github.com/huggingface/tokenizers) library  
 
-[![Windows build status](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml/badge.svg)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml)  
+[![Build (Windows-x64)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml/badge.svg?branch=main)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml)  
 
 # Nuget Package list
 
