@@ -10,13 +10,7 @@ $arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitect
     Default { "unknown" }
 }
 
-if ($IsWindows -or $ENV:OS) {
-    $destinationPath = "../nuget/win-$arch/"
-}
-else {
-    Write-Output "Unsupported OS"
-    exit
-}
+$destinationPath = "../nuget/win-$arch/"
 
 
 if (-not (Test-Path -Path $destinationPath)) {
