@@ -93,3 +93,16 @@ Console.ReadKey();
    2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
 
 Each build artifacts will be in `nuget` directory.  
+
+## Cross-platform build
+
+You can use the Dockerfile to compile the DLLs for windows x64 and windows arm64.
+Execute the following commands:
+
+```sh
+PS > .\update_version.ps1
+PS > docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
+PS > docker run -v out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
+PS > .\copy_libs_from_docker.ps1
+PS > .\build_dotnet.ps1
+```
