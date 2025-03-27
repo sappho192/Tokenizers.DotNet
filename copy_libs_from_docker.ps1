@@ -2,7 +2,7 @@ $archList = @("x64", "arm64")
 
 foreach ($arch in $archList) {
     $sourceFile = "out/$arch/hf_tokenizers.dll"
-    $destinationPath = "../nuget/win-$arch/"
+    $destinationPath = "nuget/win-$arch/"
     
     if (-not (Test-Path -Path $destinationPath)) {
         New-Item -Path $destinationPath -ItemType Directory
@@ -17,5 +17,5 @@ foreach ($arch in $archList) {
     
     Set-Location -Path "nuget\win-$arch"
     nuget pack Tokenizers.DotNet.runtime.win-$arch.nuspec
-    Pop-Location
+    Set-Location -Path "..\..\"
 }
