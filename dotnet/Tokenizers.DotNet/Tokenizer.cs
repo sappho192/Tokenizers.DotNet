@@ -44,22 +44,6 @@ namespace Tokenizers.DotNet
             }
         }
 
-        public uint[] EncodeAttentionMask(string text)
-        {
-            unsafe
-            {
-                fixed (char* p = sessionId)
-                {
-                    fixed (char* pt = text)
-                    {
-                        var tokensRaw = NativeMethods.tokenizer_encode((ushort*)p, sessionId.Length, (ushort*)pt, text.Length);
-                        var tokens = tokensRaw->AsSpan<uint>();
-                        return tokens.ToArray();
-                    }
-                }
-            }
-        }
-
         public string Decode(uint[] tokens)
         {
             string result = string.Empty;

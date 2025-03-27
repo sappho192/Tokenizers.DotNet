@@ -34,9 +34,6 @@ namespace CsBindgen
         [DllImport(__DllName, EntryPoint = "tokenizer_encode", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         internal static extern ByteBuffer* tokenizer_encode(ushort* _session_id, int _session_id_len, ushort* _text, int _text_len);
 
-        [DllImport(__DllName, EntryPoint = "tokenizer_attention_mask", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern ByteBuffer* tokenizer_attention_mask(ushort* _session_id, int _session_id_len, ushort* _text, int _text_len);
-
         [DllImport(__DllName, EntryPoint = "tokenizer_decode", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         internal static extern ByteBuffer* tokenizer_decode(ushort* _session_id, int _session_id_len, uint* _token_ids, int _token_ids_len);
 
