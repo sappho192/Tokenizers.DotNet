@@ -27,9 +27,11 @@ WORKDIR /src/rust
 # Windows x64
 FROM base AS winX64Builder
 
+RUN apt-get update && apt-get install -y mingw-w64
+
 RUN rustup target add x86_64-pc-windows-gnu
 
-RUN cargo build --release
+RUN cargo build --target x86_64-pc-windows-gnu --release
 
 FROM base AS winARM64Builder
 
@@ -53,5 +55,9 @@ RUN cargo build --target aarch64-pc-windows-gnullvm --release
 FROM rust:1.85.0-bookworm
 
 WORKDIR /out
-COPY --from=winX64Builder /src/rust/target/release/hf_tokenizers.dll /out/x64/hf_tokenizers.dll
-COPY --from=winARM64Builder /src/rust/target/release/hf_tokenizers.dll /out/arm64/hf_tokenizers.dll
+WORKDIR /tmp
+
+COPY --from=winX64Builder /src/rust/target/x86_64-pc-windows-gnu/release/hf_tokenizers.dll /tmp/x64/hf_tokenizers.dll
+COPY --from=winARM64Builder /src/rust/target/aarch64-pc-windows-gnullvm/release/hf_tokenizers.dll /tmp/arm64/hf_tokenizers.dll
+
+CMD ["cp", "-a", "/tmp/.", "/out/"]
