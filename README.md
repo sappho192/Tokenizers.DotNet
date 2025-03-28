@@ -11,18 +11,20 @@
 
 .NET wrapper of HuggingFace [Tokenizers](https://github.com/huggingface/tokenizers) library  
 
-[![Windows build status](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows.yml/badge.svg)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows.yml)  
+[![Build (Windows-x64)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml/badge.svg)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml)
 
 # Nuget Package list
 
 | Package                       | main                                                                                                              | Description                     |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------- |
 | Tokenizers.DotNet             | [![Nuget Tokenizers.DotNet](https://img.shields.io/nuget/v/Tokenizers.DotNet.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet/)                         | Core library                    |
-| Tokenizers.DotNet.runtime.win | [![Nuget Tokenizers.DotNet.runtime.win](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win/) | Native bindings for windows x64 |
+| Tokenizers.DotNet.runtime.win-x64 | [![Nuget Tokenizers.DotNet.runtime.win-x64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win-x64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win-x64/) | Native bindings for windows x64 |
+| Tokenizers.DotNet.runtime.win-arm64 | [![Nuget Tokenizers.DotNet.runtime.win-arm64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win-arm64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win-arm64/) | Native bindings for windows arm64 |
 
 # Requirements
 
 - .NET 6 or above
+- (Build) Latest [Rust](https://www.rust-lang.org/tools/install)
 
 # Supported functionalities
 
@@ -36,7 +38,7 @@
 ## (1) Install the packages
 
 1. From the NuGet, install `Tokenizers.DotNet` package
-2. And then, install `Tokenizers.DotNet.runtime.win` package too
+2. And then, install `Tokenizers.DotNet.runtime.win-<ARCH>` package too (`win-x64` or `win-arm64`)
 
 ## (2) Write the code
 
@@ -86,9 +88,10 @@ Console.ReadKey();
 
 1. Prepare following stuff:
    1.  Rust build system (`cargo`)
-   2.  .NET build system (`dotnet 6.0, 7.0, 8.0`)
+   2.  .NET build system (`dotnet 6.0, 7.0, 8.0, 9.0`)
    3.  PowerShell (Recommend `7.4.2` or above)
-2. Run `build_all_clean.ps1`
+2. Bump the version number in `NATIVE_LIB_VERSION.txt`
+3. Run `build_all_clean.ps1`
    1. To build `Tokenizers.DotNet.runtime.win` only, run `build_rust.ps1`
    2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
 
