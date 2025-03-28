@@ -110,7 +110,7 @@ PS > docker run -v .\out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 Linux/MacOS:
 ```shell
 $ docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
-$ docker run -v out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
+$ docker run -v ./out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 ```
 
 Built packages will be in the `out` folder
