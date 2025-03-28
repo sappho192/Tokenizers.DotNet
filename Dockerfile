@@ -1,63 +1,112 @@
-﻿FROM rust:1.85.0-bookworm AS base
+﻿# https://github.com/mstorsjo/llvm-mingw
+ARG RUST_VERSION=1.85.0
 
-# Install powershell
-SHELL ["/bin/bash", "-c"]
+FROM rust:${RUST_VERSION}-bookworm AS rust
+
+# Win X64
+FROM rust AS winx64
+
 RUN apt-get update && \
-    apt-get install -y wget && \
-    source /etc/os-release && \
-    wget -q https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    apt-get update && \
-    apt-get install -y powershell 
-
-# Install nuget + dotnet
-RUN apt-get update && \
-    apt-get install -y nuget && \
-    wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
-    chmod +x ./dotnet-install.sh && \
-    ./dotnet-install.sh --channel 9.0
-
-ENV PATH=$PATH:/root/.dotnet
-
-WORKDIR /src
-COPY . .
-WORKDIR /src/rust
-
-# Windows x64
-FROM base AS winX64Builder
-
-RUN apt-get update && apt-get install -y mingw-w64
+    apt-get install -qqy --no-install-recommends mingw-w64
 
 RUN rustup target add x86_64-pc-windows-gnu
 
-RUN cargo build --target x86_64-pc-windows-gnu --release
+WORKDIR /src
 
-FROM base AS winARM64Builder
-
-RUN rustup target add aarch64-pc-windows-gnullvm
-
-# Add custom Linux x64 -> Windows Arm64 compiler
-WORKDIR /compiler
-ARG COMPILER="llvm-mingw-20250319-msvcrt-ubuntu-20.04-x86_64"
-RUN wget https://github.com/mstorsjo/llvm-mingw/releases/download/20250319/${COMPILER}.tar.xz
-RUN tar xf ${COMPILER}.tar.xz
-RUN rm ${COMPILER}.tar.xz
-RUN cp -r ${COMPILER}/generic-w64-mingw32/include /usr/local
-ENV PATH="$PATH:/compiler/${COMPILER}/bin"
-ENV CXX=aarch64-w64-mingw32-clang++
-ENV CC=aarch64-w64-mingw32-clang
-ENV CXXFLAGS="-isystem /compiler/${COMPILER}/include/c++/v1 --sysroot=/compiler/${COMPILER} --stdlib=libc++"
+COPY . .
 
 WORKDIR /src/rust
+
+RUN cargo build --target x86_64-pc-windows-gnu --release
+
+# Win ARM64
+FROM mstorsjo/llvm-mingw:20250319 AS winarm64
+
+RUN apt-get update && \
+    apt-get install -qqy --no-install-recommends g++ mingw-w64
+
+# Install Rust
+COPY --from=rust /usr/local/cargo /usr/local/cargo
+COPY --from=rust /usr/local/rustup /usr/local/rustup
+ENV PATH="$PATH:/usr/local/cargo/bin"
+
+RUN rustup default stable
+RUN rustup target add aarch64-pc-windows-gnullvm
+
+WORKDIR /src
+
+COPY . .
+
+WORKDIR /src/rust
+
+ENV CXXFLAGS="--stdlib=libc++"
 RUN cargo build --target aarch64-pc-windows-gnullvm --release
 
-FROM rust:1.85.0-bookworm
+# Linux X64
+FROM rust AS linuxx64
 
-WORKDIR /out
-WORKDIR /tmp
+RUN rustup target add x86_64-unknown-linux-gnu
 
-COPY --from=winX64Builder /src/rust/target/x86_64-pc-windows-gnu/release/hf_tokenizers.dll /tmp/x64/hf_tokenizers.dll
-COPY --from=winARM64Builder /src/rust/target/aarch64-pc-windows-gnullvm/release/hf_tokenizers.dll /tmp/arm64/hf_tokenizers.dll
+WORKDIR /src
 
-CMD ["cp", "-a", "/tmp/.", "/out/"]
+COPY . .
+
+WORKDIR /src/rust
+RUN cargo build --target x86_64-unknown-linux-gnu --release
+
+# Linux ARM64
+FROM rust AS linuxarm64
+
+RUN apt-get update && \
+    apt-get purge -y g++ && \
+    apt-get install -qqy --no-install-recommends g++-aarch64-linux-gnu libc6-dev-arm64-cross
+
+RUN rustup target add aarch64-unknown-linux-gnu
+#RUN rustup toolchain install stable-aarch64-unknown-linux-gnu
+
+WORKDIR /src
+
+COPY . .
+
+WORKDIR /src/rust
+ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
+    CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc \
+    CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
+RUN cargo build --target aarch64-unknown-linux-gnu --release
+
+FROM rust
+
+WORKDIR /src
+
+# Install nuget + dotnet
+RUN apt-get update && \
+    apt-get install -y nuget mono-complete && \
+    wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
+    chmod +x ./dotnet-install.sh && \
+    ./dotnet-install.sh --channel 9.0 && \
+    nuget update -self
+
+ENV PATH=$PATH:/root/.dotnet
+
+COPY . .
+
+# Update version
+RUN bash update_version.sh
+
+COPY --from=winx64 /src/rust/target/x86_64-pc-windows-gnu/release/hf_tokenizers.dll /src/nuget/win-x64/hf_tokenizers.dll
+COPY --from=winarm64 /src/rust/target/aarch64-pc-windows-gnullvm/release/hf_tokenizers.dll /src/nuget/win-arm64/hf_tokenizers.dll
+COPY --from=linuxx64 /src/rust/target/x86_64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-x64/libhf_tokenizers.so
+COPY --from=linuxarm64 /src/rust/target/aarch64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-arm64/libhf_tokenizers.so
+
+# Pack individual packages
+RUN bash pack.sh
+
+# Build project
+RUN cd dotnet/Tokenizers.DotNet && \
+    dotnet build --configuration Release 
+
+# Pack nuget
+RUN cd nuget && \
+    nuget pack Tokenizers.DotNet.nuspec
+
+CMD ["cp", "-a", "/src/nuget/*.", "/out/"]
