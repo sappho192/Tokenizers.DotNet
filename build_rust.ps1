@@ -20,11 +20,17 @@ $cargoContent = $cargoContent -replace '(?<=^version\s*=\s*")[^"]*', $version
 Set-Content -Path $cargoTomlPath -Value $cargoContent
 Write-Output "Updated version in Cargo.toml"
 
-# Step 3: Replace the version in.nuspec file
-$nuspecFilePath = ".\nuget\win-$arch\Tokenizers.DotNet.runtime.win-$arch.nuspec"
-$nuspecContent = Get-Content -Path $nuspecFilePath
-$nuspecContent = $nuspecContent -replace '(?<=<version>)[^<]*', $version
-Set-Content -Path $nuspecFilePath -Value $nuspecContent
+# Step 3: Replace the version in every .nuspec file
+# If we just use $arch, other .nuspec file won't be updated since $arch only contains the current architecture
+$archList = @("x64", "arm64")
+
+foreach ($currentArch in $archList) {
+    $nuspecFilePath = ".\nuget\win-$currentArch\Tokenizers.DotNet.runtime.win-$currentArch.nuspec"
+    $nuspecContent = Get-Content -Path $nuspecFilePath
+    $nuspecContent = $nuspecContent -replace '(?<=<version>)[^<]*', $version
+    Set-Content -Path $nuspecFilePath -Value $nuspecContent
+}
+
 Write-Output "Updated version in nuspec file"
 
 # Step 4: Build the library
