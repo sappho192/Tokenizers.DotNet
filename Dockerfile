@@ -80,7 +80,7 @@ WORKDIR /src
 
 # Install nuget + dotnet
 RUN apt-get update && \
-    apt-get install -y nuget mono-complete && \
+    apt-get install -y nuget mono-complete dos2unix && \
     wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
     chmod +x ./dotnet-install.sh && \
     ./dotnet-install.sh --channel 9.0 && \
@@ -91,6 +91,7 @@ ENV PATH=$PATH:/root/.dotnet
 COPY . .
 
 # Update version
+RUN dos2unix update_version.sh
 RUN bash update_version.sh
 
 COPY --from=winx64 /src/rust/target/x86_64-pc-windows-gnu/release/hf_tokenizers.dll /src/nuget/win-x64/hf_tokenizers.dll
@@ -99,6 +100,7 @@ COPY --from=linuxx64 /src/rust/target/x86_64-unknown-linux-gnu/release/libhf_tok
 COPY --from=linuxarm64 /src/rust/target/aarch64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-arm64/libhf_tokenizers.so
 
 # Pack individual packages
+RUN dos2unix pack.sh
 RUN bash pack.sh
 
 # Build project
@@ -109,4 +111,4 @@ RUN cd dotnet/Tokenizers.DotNet && \
 RUN cd nuget && \
     nuget pack Tokenizers.DotNet.nuspec
 
-CMD ["cp", "-a", "/src/nuget/*.", "/out/"]
+CMD ["cp", "-a", "/src/nuget/.", "/out/"]
