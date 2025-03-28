@@ -99,13 +99,16 @@ Each build artifacts will be in `nuget` directory.
 
 ## Cross-platform build
 
-You can use the Dockerfile to compile the DLLs for windows x64 and windows arm64.
-Execute the following commands:
+You can use Docker to compile this library for Windows x64/arm64 and Linux x64/arm64
 
-```sh
-PS > .\update_version.ps1
+Windows:
+```shell
 PS > docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
 PS > docker run -v .\out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
-PS > .\copy_libs_from_docker.ps1
-PS > .\build_dotnet.ps1
+```
+
+Linux/MacOS:
+```shell
+$ docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
+$ docker run -v out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 ```
