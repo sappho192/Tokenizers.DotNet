@@ -9,5 +9,6 @@ sed -E 's/^(version\s*=\s*")[^"]*/\1'"$version"'/' "rust/Cargo.toml"
 find nuget -type f -name "*.nuspec" | while IFS= read -r nuspecFile; do
     echo "Processing: $nuspecFile"
     # Use sed to replace the content within the <version> tags
-    sed -i "s/(<version>)[^<]*(<\/version>)/\1$version\2/" "$nuspecFile"
+    sed -i.bak -E "s/(<version>)[^<]*(<\/version>)/\1$version\2/" "$nuspecFile"
+    rm "$nuspecFile.bak"
 done
