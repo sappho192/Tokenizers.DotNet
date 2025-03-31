@@ -95,4 +95,24 @@ Console.ReadKey();
    1. To build `Tokenizers.DotNet.runtime.win` only, run `build_rust.ps1`
    2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
 
-Each build artifacts will be saved in `nuget` directory.  
+Each build artifacts will be in `nuget` directory.  
+
+## Cross-platform build
+
+You can use Docker to compile this library for Windows x64/arm64 and Linux x64/arm64
+
+Run `update_version.ps1` before running Docker to update the package version.
+
+Windows:
+```shell
+PS > docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
+PS > docker run -v .\nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
+```
+
+Linux/MacOS:
+```shell
+$ docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
+$ docker run -v ./nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
+```
+
+Built packages will be in the `nuget` folder

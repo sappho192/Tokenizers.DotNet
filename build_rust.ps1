@@ -1,6 +1,15 @@
 Push-Location
 
-# Step 0: Get the host's cpu architecture
+# Build the library for the current platform
+Set-Location -Path "rust"
+cargo build --release
+if ($LASTEXITCODE -ne 0) {
+    Pop-Location
+    exit $LASTEXITCODE
+}
+
+$sourceFile = "target/release/hf_tokenizers.dll"
+
 $arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
     "X64"  { "x64" }
     "X86"  { "x86" }
@@ -9,40 +18,14 @@ $arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitect
     Default { "unknown" }
 }
 
-# Step 1: Read the version from VERSION.txt
-$version = Get-Content -Path ".\NATIVE_LIB_VERSION.txt"
-Write-Output "Version: $version"
-
-# Step 2: Replace the version in Cargo.toml
-$cargoTomlPath = ".\rust\Cargo.toml"
-$cargoContent = Get-Content -Path $cargoTomlPath
-$cargoContent = $cargoContent -replace '(?<=^version\s*=\s*")[^"]*', $version
-Set-Content -Path $cargoTomlPath -Value $cargoContent
-Write-Output "Updated version in Cargo.toml"
-
-# Step 3: Replace the version in every .nuspec file
-# If we just use $arch, other .nuspec file won't be updated since $arch only contains the current architecture
-$archList = @("x64", "arm64")
-
-foreach ($currentArch in $archList) {
-    $nuspecFilePath = ".\nuget\win-$currentArch\Tokenizers.DotNet.runtime.win-$currentArch.nuspec"
-    $nuspecContent = Get-Content -Path $nuspecFilePath
-    $nuspecContent = $nuspecContent -replace '(?<=<version>)[^<]*', $version
-    Set-Content -Path $nuspecFilePath -Value $nuspecContent
+$os = switch -Wildcard ([System.Runtime.InteropServices.RuntimeInformation]::OSDescription) {
+    "*Windows*" { "win"; break }
+    "*Linux*"   { "linux"; break }
+    Default    { "unknown" }
 }
 
-Write-Output "Updated version in nuspec file"
+$destinationPath = "../nuget/$os-$arch/";
 
-# Step 4: Build the library
-Set-Location -Path "rust"
-cargo build --release
-if ($LASTEXITCODE -ne 0) {
-    Pop-Location
-    exit $LASTEXITCODE
-}
+Copy-Item -Path $sourceFile -Destination $destinationPath -Force
 
-&.\copy_libs.ps1
-Set-Location -Path ".."
-Set-Location -Path "nuget\win-$arch"
-nuget pack Tokenizers.DotNet.runtime.win-$arch.nuspec
 Pop-Location
