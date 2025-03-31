@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 csbindgen = "1.9.3"
 
 [dependencies]
-tokenizers = "0.20.0"
+tokenizers = "0.21.1"
 once_cell = "1.19.0"
 uuid = { version = "1.8.0", features = ["v4", "fast-rng", "macro-diagnostics"] }
 
