@@ -1,32 +1,18 @@
 Push-Location
 
-$arch = switch ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture) {
-    "X64"  { "x64" }
-    "X86"  { "x86" }
-    "Arm"  { "arm" }
-    "Arm64" { "arm64" }
-    Default { "unknown" }
-}
-
-Set-Location -Path ".\nuget\win-$arch"
-if (Test-Path -Path "Tokenizers.DotNet.runtime.win-$arch*.nupkg") {
-    Remove-Item "Tokenizers.DotNet.runtime.win-$arch*.nupkg" -Force
-}
-if (Test-Path -Path "hf_tokenizers.dll") {
-    Remove-Item "hf_tokenizers.dll" -Force
-}
-
-Set-Location -Path ".."
-if (Test-Path -Path "Tokenizers.DotNet.*.nupkg") {
-    Remove-Item "Tokenizers.DotNet.*.nupkg" -Force
-}
-
-if (Test-Path -Path "net*") {
-    Remove-Item "net*" -Force
+# Remove every built nupkg and shared library
+Get-ChildItem -Path "nuget" -Recurse -Include *.nupkg, *.dll, *.so, *.dylib -File -Force | ForEach-Object {
+    try {
+        Remove-Item $_.FullName -Force
+        Write-Host "Removed file: $($_.FullName)"
+    } catch {
+        Write-Host "Failed to remove file: $($_.FullName) - $($_.Exception.Message)"
+    }
 }
 Pop-Location
 
 Push-Location
+# Remove dotnet cache
 Set-Location -Path ".\dotnet\Tokenizers.DotNet"
 if (Test-Path -Path ".\bin") {
     Remove-Item "bin" -Force -Recurse
