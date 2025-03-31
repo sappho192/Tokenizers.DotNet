@@ -98,15 +98,14 @@ RUN apt-get update && \
 ENV PATH=$PATH:/root/.dotnet
 
 COPY . .
+# Clean
+RUN dos2unix clear_all.ps1
+RUN pwsh -File clear_all.ps1
 
 COPY --from=winx64 /src/rust/target/x86_64-pc-windows-gnu/release/hf_tokenizers.dll /src/nuget/win-x64/hf_tokenizers.dll
 COPY --from=winarm64 /src/rust/target/aarch64-pc-windows-gnullvm/release/hf_tokenizers.dll /src/nuget/win-arm64/hf_tokenizers.dll
 COPY --from=linuxx64 /src/rust/target/x86_64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-x64/libhf_tokenizers.so
 COPY --from=linuxarm64 /src/rust/target/aarch64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-arm64/libhf_tokenizers.so
-
-# Clean
-RUN dos2unix clear_all.ps1
-RUN pwsh -File clear_all.ps1
 
 # Build
 RUN dos2unix build_dotnet.ps1
