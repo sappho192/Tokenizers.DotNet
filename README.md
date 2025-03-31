@@ -101,16 +101,18 @@ Each build artifacts will be in `nuget` directory.
 
 You can use Docker to compile this library for Windows x64/arm64 and Linux x64/arm64
 
+Run `update_version.ps1` before running Docker to update the package version.
+
 Windows:
 ```shell
 PS > docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
-PS > docker run -v .\out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
+PS > docker run -v .\nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 ```
 
 Linux/MacOS:
 ```shell
 $ docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
-$ docker run -v ./out:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
+$ docker run -v ./nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 ```
 
-Built packages will be in the `out` folder
+Built packages will be in the `nuget` folder
