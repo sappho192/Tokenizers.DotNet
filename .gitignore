@@ -7,5 +7,6 @@ nuget/linux-arm64/*
 !Tokenizers.DotNet.runtime.linux-x64.nuspec
 !Tokenizers.DotNet.runtime.linux-arm64.nuspec
 nuget/Tokenizers.DotNet.*.nupkg
+out/
 
 .vscode/*
