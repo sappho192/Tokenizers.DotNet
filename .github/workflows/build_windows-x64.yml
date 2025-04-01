@@ -39,5 +39,5 @@ jobs:
       with:
         name: Built packages
         path: |
-          nuget/win-x64/Tokenizers.DotNet.runtime.win.*.nupkg
+          nuget/win-x64/Tokenizers.DotNet.runtime.win-x64.*.nupkg
           nuget/Tokenizers.DotNet.*.nupkg
