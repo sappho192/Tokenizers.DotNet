@@ -13,7 +13,7 @@
 .NET wrapper of HuggingFace [Tokenizers](https://github.com/huggingface/tokenizers) library  
 
 [![Build (Windows-x64)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml/badge.svg)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/build_windows-x64.yml)
-[![Build (Multi-platform)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/docker-image.yml/badge.svg?branch=main)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/docker-image.yml)
+[![Build (Multi-platform)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/docker-image.yml/badge.svg)](https://github.com/sappho192/Tokenizers.DotNet/actions/workflows/docker-image.yml)
 
 # Nuget Package list
 
