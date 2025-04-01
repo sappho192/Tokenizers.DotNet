@@ -1,0 +1,39 @@
+name: Build (Multi-platform)
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Get commit name
+      id: vars
+      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag ghcr.io/sappho192/tokenizers.dotnet:${{ steps.vars.outputs.sha_short }} .
+    - name: Run the Docker image
+      run: docker run -v ./nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:${{ steps.vars.outputs.sha_short }}
+    - name: 'Artifacts'
+      uses: actions/upload-artifact@v4
+      with:
+        name: Built packages
+        path: |
+          nuget/win-x64/Tokenizers.DotNet.runtime.win-x64.*.nupkg
+          nuget/win-arm64/Tokenizers.DotNet.runtime.win-arm64.*.nupkg
+          nuget/linux-x64/Tokenizers.DotNet.runtime.linux-x64.*.nupkg
+          nuget/linux-arm64/Tokenizers.DotNet.runtime.linux-arm64.*.nupkg
+          nuget/Tokenizers.DotNet.*.nupkg
