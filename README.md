@@ -6,6 +6,7 @@
   - [(1) Install the packages](#1-install-the-packages)
   - [(2) Write the code](#2-write-the-code)
 - [How to build](#how-to-build)
+  - [Cross-platform build](#cross-platform-build)
 
 # Tokenizers.DotNet
 
@@ -20,6 +21,8 @@
 | Tokenizers.DotNet             | [![Nuget Tokenizers.DotNet](https://img.shields.io/nuget/v/Tokenizers.DotNet.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet/)                         | Core library                    |
 | Tokenizers.DotNet.runtime.win-x64 | [![Nuget Tokenizers.DotNet.runtime.win-x64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win-x64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win-x64/) | Native bindings for windows x64 |
 | Tokenizers.DotNet.runtime.win-arm64 | [![Nuget Tokenizers.DotNet.runtime.win-arm64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win-arm64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win-arm64/) | Native bindings for windows arm64 |
+| Tokenizers.DotNet.runtime.linux-x64 | [![Nuget Tokenizers.DotNet.runtime.linux-x64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.linux-x64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.linux-x64/) | Native bindings for linux x64 |
+| Tokenizers.DotNet.runtime.linux-arm64 | [![Nuget Tokenizers.DotNet.runtime.linux-arm64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.linux-arm64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.linux-arm64/) | Native bindings for linux arm64 |
 
 # Requirements
 
@@ -38,7 +41,7 @@
 ## (1) Install the packages
 
 1. From the NuGet, install `Tokenizers.DotNet` package
-2. And then, install `Tokenizers.DotNet.runtime.win-<ARCH>` package too (`win-x64` or `win-arm64`)
+2. And then, install `Tokenizers.DotNet.runtime.<OS>-<ARCH>` package too (e.a `win-x64` or `linux-arm64`, check Nuget package list above).
 
 ## (2) Write the code
 
@@ -92,7 +95,7 @@ Console.ReadKey();
    3.  PowerShell (Recommend `7.4.2` or above)
 2. Bump the version number in `NATIVE_LIB_VERSION.txt`
 3. Run `build_all_clean.ps1`
-   1. To build `Tokenizers.DotNet.runtime.win` only, run `build_rust.ps1`
+   1. To build `Tokenizers.DotNet.runtime.<OS>` only, run `build_rust.ps1`
    2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
 
 Each build artifacts will be in `nuget` directory.  
@@ -115,4 +118,4 @@ $ docker build -f Dockerfile -t ghcr.io/sappho192/tokenizers.dotnet:latest .
 $ docker run -v ./nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 ```
 
-Built packages will be in the `nuget` folder
+Built packages will be in the `nuget` folder.
