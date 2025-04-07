@@ -22,3 +22,5 @@ foreach ($file in $nuspecFiles) {
     
     Write-Output "Updated version in $nuspecFilePath"
 }
+
+Pop-Location
