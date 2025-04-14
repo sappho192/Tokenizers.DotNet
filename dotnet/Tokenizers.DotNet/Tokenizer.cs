@@ -8,26 +8,36 @@ namespace Tokenizers.DotNet
         private Tokenizer() { }
         private readonly string sessionId;
 
+        /// <summary>
+        /// Throws exception if error occured during tokenizer initialization.
+        /// </summary>
+        /// <param name="vocabPath"></param>
         public Tokenizer(string vocabPath)
         {
             unsafe
             {
                 fixed (char* p = vocabPath)
                 {
-                    var session_id = NativeMethods.tokenizer_initialize((ushort*)p, vocabPath.Length);
-                    try
+                    var tokenizerResult = NativeMethods.tokenizer_initialize((ushort*)p, vocabPath.Length);
+                    if (tokenizerResult.error_code == 0)
                     {
-                        var str = Encoding.UTF8.GetString(session_id->AsSpan());
+                        var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
                         sessionId = new string(str);
                     }
-                    finally
+                    else
                     {
-                        NativeMethods.free_u8_string(session_id);
+                        throw new TokenizerException(GetLastError(), (int)tokenizerResult.error_code);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Throws exception if error occured from native library.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        /// <exception cref="TokenizerException"></exception>
         public uint[] Encode(string text)
         {
             unsafe
@@ -36,14 +46,26 @@ namespace Tokenizers.DotNet
                 {
                     fixed (char* pt = text)
                     {
-                        var tokensRaw = NativeMethods.tokenizer_encode((ushort*)p, sessionId.Length, (ushort*)pt, text.Length);
-                        var tokens = tokensRaw->AsSpan<uint>();
-                        return tokens.ToArray();
+                        var tokenizerResult = NativeMethods.tokenizer_encode((ushort*)p, sessionId.Length, (ushort*)pt, text.Length);
+                        if (tokenizerResult.error_code == 0)
+                        {
+                            var tokens = tokenizerResult.data->AsSpan<uint>();
+                            return tokens.ToArray();
+                        }
+                        else
+                        {
+                            throw new TokenizerException(GetLastError(), (int)tokenizerResult.error_code);
+                        }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Throws exception if error occured from native library.
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
         public string Decode(uint[] tokens)
         {
             string result = string.Empty;
@@ -54,17 +76,18 @@ namespace Tokenizers.DotNet
                 {
                     fixed (char* cp = sessionId)
                     {
-                        var decoded = NativeMethods.tokenizer_decode(
+                        var tokenizerResult = NativeMethods.tokenizer_decode(
                             (ushort*)cp, sessionId.Length,
                             p, tokens.Length);
-                        try
+                        if (tokenizerResult.error_code == 0)
                         {
-                            var str = Encoding.UTF8.GetString(decoded->AsSpan());
+                            var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
                             result = new string(str);
+                            NativeMethods.free_u8_string(tokenizerResult.data);
                         }
-                        finally
+                        else
                         {
-                            NativeMethods.free_u8_string(decoded);
+                            throw new TokenizerException(GetLastError(), (int)tokenizerResult.error_code);
                         }
                     }
                 }
@@ -73,26 +96,50 @@ namespace Tokenizers.DotNet
             return result;
         }
 
+        /// <summary>
+        /// Throws exception if error occured from native library.
+        /// </summary>
+        /// <returns></returns>
         public string GetVersion()
         {
             string result = string.Empty;
             unsafe
             {
-                fixed(char* cp = sessionId)
+                fixed (char* cp = sessionId)
                 {
-                    var versionBytes = NativeMethods.get_version((ushort*)cp, sessionId.Length);
-                    try
+                    var tokenizerResult = NativeMethods.get_version((ushort*)cp, sessionId.Length);
+                    if (tokenizerResult.error_code == 0)
                     {
-                        var str = Encoding.UTF8.GetString(versionBytes->AsSpan());
+                        var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
                         result = new string(str);
+                        NativeMethods.free_u8_string(tokenizerResult.data);
                     }
-                    finally
+                    else
                     {
-                        NativeMethods.free_u8_string(versionBytes);
+                        throw new TokenizerException(GetLastError(), (int)tokenizerResult.error_code);
                     }
                 }
             }
 
+            return result;
+        }
+
+        private string GetLastError()
+        {
+            var result = string.Empty;
+            unsafe
+            {
+                var errorBytes = NativeMethods.get_last_error_message();
+                try
+                {
+                    var str = Encoding.UTF8.GetString(errorBytes->AsSpan());
+                    result = new string(str);
+                }
+                finally
+                {
+                    NativeMethods.free_u8_string(errorBytes);
+                }
+            }
             return result;
         }
     }
