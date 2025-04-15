@@ -1,5 +1,4 @@
-﻿/*
-NOTE: Currently the unit test for FFI is based on win-x64 only.
+/*
  */
 
 using CsBindgen;
