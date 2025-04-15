@@ -34,6 +34,10 @@ jobs:
       shell: pwsh
       run: |
         .\build_dotnet.ps1
+    - name: Test (Dotnet library)
+      shell: pwsh
+      run: |
+        .\test_dotnet.ps1
     - name: 'Artifacts'
       uses: actions/upload-artifact@v4
       with:
