@@ -28,4 +28,8 @@ $destinationPath = "../nuget/$os-$arch/";
 
 Copy-Item -Path $sourceFile -Destination $destinationPath -Force
 
+$destinationPath = "../dotnet/Tokenizers.DotNet.Test/"
+
+Copy-Item -Path $sourceFile -Destination $destinationPath -Force
+
 Pop-Location
