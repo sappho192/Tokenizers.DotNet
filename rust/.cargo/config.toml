@@ -4,6 +4,12 @@ rustflags = [
     "-C", "link-args=-static-libgcc -static-libstdc++"
 ]
 
+[target.aarch64-pc-windows-gnullvm]
+rustflags = [
+    "-C", "target-feature=+crt-static",
+    "-C", "link-args=-static-libgcc -static-libstdc++"
+]
+
 [build.aarch64-pc-windows-gnullvm]
 linker = "aarch64-w64-mingw32-clang++"
 ar = "aarch64-w64-mingw32-llvm-ar"
