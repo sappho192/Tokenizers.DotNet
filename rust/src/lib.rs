@@ -107,6 +107,9 @@ pub unsafe extern "C" fn csharp_to_rust_u32_array(buffer: *const u32, len: i32) 
     println!("{:?}", vec);
 }
 
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 // Tokenizer stuff starts here
 use std::collections::HashMap;
 use std::fmt;
