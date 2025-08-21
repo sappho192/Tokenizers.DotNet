@@ -49,8 +49,9 @@ public sealed class TokenizerFixture : IAsyncLifetime
         try
         {
             // Download to temporary file and then atomically move to prevent broken files
+            File.Delete(filePath);
             var tempFile = await HuggingFace.GetFileFromHub(ModelName, FileName, tempPath);
-            File.Move(tempFile, filePath, true);
+            File.Move(tempFile, filePath);
         }
         finally
         {
