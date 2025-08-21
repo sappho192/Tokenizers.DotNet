@@ -2,7 +2,7 @@ namespace Tokenizers.DotNet.Test
 {
     public class APITest
     {
-        [Fact]
+        [Fact(Skip = "Manual testing to prevent HF overload by CI")]
         public async Task DownloadTokenFile()
         {
             var hubName = "skt/kogpt2-base-v2";

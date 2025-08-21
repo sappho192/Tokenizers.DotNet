@@ -6,25 +6,28 @@ using System.Text;
 
 namespace Tokenizers.DotNet.Test
 {
+    [Collection(TokenizerCollection.Name)]
     public class FFITest
     {
-        [Fact]
-        public async Task CheckInitialization()
+        private readonly TokenizerFixture _model;
+
+        public FFITest(TokenizerFixture model)
         {
-            var hubName = "skt/kogpt2-base-v2";
-            var filePath = "tokenizer.json";
-            var fileFullPath = await HuggingFace.GetFileFromHub(hubName, filePath, "deps");
+            _model = model ?? throw new ArgumentNullException(nameof(model));
+        }
+
+        [Fact]
+        public unsafe void CheckInitialization()
+        {
             var sessionId = string.Empty;
-            unsafe
+            var path = Models.GetFilePath(ModelId.KoGpt2);
+            fixed (char* p = path)
             {
-                fixed (char* p = fileFullPath)
-                {
-                    var tokenizerResult = NativeMethods.tokenizer_initialize((ushort*)p, fileFullPath.Length);
-                    Assert.Equal(TokenizerErrorCode.Success, tokenizerResult.error_code);
-                    var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
-                    sessionId = new string(str);
-                    Assert.True(sessionId.Length > 0);
-                }
+                var tokenizerResult = NativeMethods.tokenizer_initialize((ushort*)p, path.Length);
+                Assert.Equal(TokenizerErrorCode.Success, tokenizerResult.error_code);
+                var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
+                sessionId = new string(str);
+                Assert.True(sessionId.Length > 0);
             }
         }
     }
