@@ -1,20 +1,16 @@
-﻿namespace Tokenizers.DotNet.Test;
+﻿using System.Collections.Concurrent;
+
+namespace Tokenizers.DotNet.Test;
 
 public sealed class TokenizerFixture
 {
-    private const string ModelPath = "../../../../../test-assets/tokenizers";
-    private const string ModelName = "skt/kogpt2-base-v2";
-    private const string FileName = "tokenizer.json";
-
-    private readonly Lazy<Tokenizer> _tokenizer;
+    private readonly Func<ModelId, Lazy<Tokenizer>> _tokenizerFactory;
+    private readonly ConcurrentDictionary<ModelId, Lazy<Tokenizer>> _tokenizers = new();
 
     public TokenizerFixture()
     {
-        FilePath = Path.GetFullPath(Path.Combine(ModelPath, ModelName, FileName));
-        _tokenizer = new(() => new(FilePath));
+        _tokenizerFactory = id => new(() => new(Models.GetFilePath(id)));
     }
 
-    public string FilePath { get; }
-
-    public Tokenizer Tokenizer => _tokenizer.Value;
+    public Tokenizer GetTokenizer(ModelId id) => _tokenizers.GetOrAdd(id, _tokenizerFactory).Value;
 }
