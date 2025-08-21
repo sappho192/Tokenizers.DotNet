@@ -111,6 +111,7 @@ pub unsafe extern "C" fn csharp_to_rust_u32_array(buffer: *const u32, len: i32) 
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 // Tokenizer stuff starts here
+use std::cell::Cell;
 use std::collections::HashMap;
 use std::fmt;
 use std::sync::{LazyLock, RwLock};
@@ -152,7 +153,9 @@ pub struct TokenizerResult {
     pub data: *mut ByteBuffer // Could be null if error occured
 }
 
-static mut LAST_ERROR_MESSAGE: String = String::new();
+thread_local! {
+    static LAST_ERROR_MESSAGE: Cell<String> = Cell::new(String::new());
+}
 
 static TOKENIZER_SESSION: LazyLock<RwLock<HashMap<String, TokenizerInfo>>> =
     LazyLock::new(|| RwLock::new(HashMap::new()));
@@ -162,7 +165,7 @@ static TOKENIZER_DB: LazyLock<RwLock<HashMap<String, Tokenizer>>> =
 
 #[no_mangle]
 pub unsafe extern "C" fn get_last_error_message() -> *mut ByteBuffer {
-    let buf = ByteBuffer::from_vec(LAST_ERROR_MESSAGE.clone().into_bytes());
+    let buf = ByteBuffer::from_vec(LAST_ERROR_MESSAGE.take().into());
     Box::into_raw(Box::new(buf))
 }
 
@@ -192,7 +195,7 @@ pub unsafe extern "C" fn tokenizer_initialize(
     let tokenizer = match Tokenizer::from_file(&utf8_path) {
         Ok(t) => t,
         Err(e) => {
-            LAST_ERROR_MESSAGE = format!("Failed to load tokenizer: {}", e);
+            LAST_ERROR_MESSAGE.set(format!("Failed to load tokenizer: {}", e));
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InitializationError,
                 data: std::ptr::null_mut(),
@@ -216,7 +219,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     _text_len: i32,
 ) -> TokenizerResult {
     if _session_id.is_null() || _session_id_len <= 0 {
-        LAST_ERROR_MESSAGE = "Invalid session ID pointer".to_string();
+        LAST_ERROR_MESSAGE.set("Invalid session ID pointer".to_string());
         return TokenizerResult {
             error_code: TokenizerErrorCode::InvalidInput,
             data: std::ptr::null_mut(),
@@ -224,7 +227,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     }
 
     if _text.is_null() && _text_len > 0 {
-        LAST_ERROR_MESSAGE = "Invalid text pointer".to_string();
+        LAST_ERROR_MESSAGE.set("Invalid text pointer".to_string());
         return TokenizerResult {
             error_code: TokenizerErrorCode::InvalidInput,
             data: std::ptr::null_mut(),
@@ -235,7 +238,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     let session_id = match String::from_utf16(slice_session_id) {
         Ok(id) => id,
         Err(_) => {
-            LAST_ERROR_MESSAGE = "Invalid UTF-16 session ID string".to_string();
+            LAST_ERROR_MESSAGE.set("Invalid UTF-16 session ID string".to_string());
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InvalidInput,
                 data: std::ptr::null_mut(),
@@ -249,7 +252,7 @@ pub unsafe extern "C" fn tokenizer_encode(
         match String::from_utf16(slice_text) {
             Ok(t) => t,
             Err(_) => {
-                LAST_ERROR_MESSAGE = "Invalid UTF-16 text string".to_string();
+                LAST_ERROR_MESSAGE.set("Invalid UTF-16 text string".to_string());
                 return TokenizerResult {
                     error_code: TokenizerErrorCode::InvalidInput,
                     data: std::ptr::null_mut(),
@@ -262,7 +265,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     let result = match TOKENIZER_DB.read().unwrap().get(&session_id) {
         Some(t) => t.encode(text, true),
         None => {
-            LAST_ERROR_MESSAGE = format!("Tokenizer for session ID '{}' not found", session_id);
+            LAST_ERROR_MESSAGE.set(format!("Tokenizer for session ID '{}' not found", session_id));
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InvalidSessionId,
                 data: std::ptr::null_mut(),
@@ -274,7 +277,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     let encoded_tokens = match result {
         Ok(encoded) => encoded,
         Err(err) => {
-            LAST_ERROR_MESSAGE = format!("Error encoding text: {}", err);
+            LAST_ERROR_MESSAGE.set(format!("Error encoding text: {}", err));
             return TokenizerResult {
                 error_code: TokenizerErrorCode::EncodingError,
                 data: std::ptr::null_mut(),
@@ -303,7 +306,7 @@ pub unsafe extern "C" fn tokenizer_decode(
     _token_ids_len: i32,
 ) -> TokenizerResult {
     if _session_id.is_null() || _session_id_len <= 0 {
-        LAST_ERROR_MESSAGE = "Invalid session ID pointer".to_string();
+        LAST_ERROR_MESSAGE.set("Invalid session ID pointer".to_string());
         return TokenizerResult {
             error_code: TokenizerErrorCode::InvalidInput,
             data: std::ptr::null_mut(),
@@ -311,7 +314,7 @@ pub unsafe extern "C" fn tokenizer_decode(
     }
 
     if _token_ids.is_null() && _token_ids_len > 0 {
-        LAST_ERROR_MESSAGE = "Invalid token IDs pointer".to_string();
+        LAST_ERROR_MESSAGE.set("Invalid token IDs pointer".to_string());
         return TokenizerResult {
             error_code: TokenizerErrorCode::InvalidInput,
             data: std::ptr::null_mut(),
@@ -322,7 +325,7 @@ pub unsafe extern "C" fn tokenizer_decode(
     let session_id = match String::from_utf16(slice_session_id) {
         Ok(id) => id,
         Err(_) => {
-            LAST_ERROR_MESSAGE = "Invalid UTF-16 session ID string".to_string();
+            LAST_ERROR_MESSAGE.set("Invalid UTF-16 session ID string".to_string());
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InvalidInput,
                 data: std::ptr::null_mut(),
@@ -340,7 +343,7 @@ pub unsafe extern "C" fn tokenizer_decode(
     let result = match TOKENIZER_DB.read().unwrap().get(&session_id) {
         Some(t) => t.decode(&token_ids_vec, true),
         None => {
-            LAST_ERROR_MESSAGE = format!("Tokenizer for session ID '{}' not found", session_id);
+            LAST_ERROR_MESSAGE.set(format!("Tokenizer for session ID '{}' not found", session_id));
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InvalidSessionId,
                 data: std::ptr::null_mut(),
@@ -352,7 +355,7 @@ pub unsafe extern "C" fn tokenizer_decode(
     let decoded_text = match result {
         Ok(decoded) => decoded,
         Err(err) => {
-            LAST_ERROR_MESSAGE = format!("Error decoding tokens: {}", err);
+            LAST_ERROR_MESSAGE.set(format!("Error decoding tokens: {}", err));
             return TokenizerResult {
                 error_code: TokenizerErrorCode::DecodingError,
                 data: std::ptr::null_mut(),
@@ -373,7 +376,7 @@ pub unsafe extern "C" fn get_version(
     _session_id_len: i32,
 ) -> TokenizerResult {
     if _session_id.is_null() || _session_id_len <= 0 {
-        LAST_ERROR_MESSAGE = "Invalid session ID pointer".to_string();
+        LAST_ERROR_MESSAGE.set("Invalid session ID pointer".to_string());
         return TokenizerResult {
             error_code: TokenizerErrorCode::InvalidInput,
             data: std::ptr::null_mut(),
@@ -384,7 +387,7 @@ pub unsafe extern "C" fn get_version(
     let session_id = match String::from_utf16(slice_session_id) {
         Ok(id) => id,
         Err(_) => {
-            LAST_ERROR_MESSAGE = "Invalid UTF-16 session ID string".to_string();
+            LAST_ERROR_MESSAGE.set("Invalid UTF-16 session ID string".to_string());
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InvalidInput,
                 data: std::ptr::null_mut(),
@@ -396,7 +399,7 @@ pub unsafe extern "C" fn get_version(
     let version = match TOKENIZER_SESSION.read().unwrap().get(&session_id) {
         Some(info) => info.library_version.clone(),
         None => {
-            LAST_ERROR_MESSAGE = format!("Session info for session ID '{}' not found", session_id);
+            LAST_ERROR_MESSAGE.set(format!("Session info for session ID '{}' not found", session_id));
             return TokenizerResult {
                 error_code: TokenizerErrorCode::InvalidSessionId,
                 data: std::ptr::null_mut(),
@@ -417,7 +420,7 @@ pub unsafe extern "C" fn tokenizer_cleanup(
     _session_id_len: i32,
 ) -> TokenizerErrorCode {
     if _session_id.is_null() || _session_id_len <= 0 {
-        LAST_ERROR_MESSAGE = "Invalid session ID pointer".to_string();
+        LAST_ERROR_MESSAGE.set("Invalid session ID pointer".to_string());
         return TokenizerErrorCode::InvalidInput;
     }
 
@@ -426,7 +429,7 @@ pub unsafe extern "C" fn tokenizer_cleanup(
     let session_id = match String::from_utf16(slice_session_id) {
         Ok(id) => id,
         Err(_) => {
-            LAST_ERROR_MESSAGE = "Invalid UTF-16 session ID string".to_string();
+            LAST_ERROR_MESSAGE.set("Invalid UTF-16 session ID string".to_string());
             return TokenizerErrorCode::InvalidInput;
         }
     };
@@ -436,7 +439,7 @@ pub unsafe extern "C" fn tokenizer_cleanup(
     let removed_session = TOKENIZER_SESSION.write().unwrap().remove(&session_id);
 
     if removed_tokenizer.is_none() || removed_session.is_none() {
-        LAST_ERROR_MESSAGE = format!("Session ID '{}' not found", session_id);
+        LAST_ERROR_MESSAGE.set(format!("Session ID '{}' not found", session_id));
         return TokenizerErrorCode::InvalidSessionId;
     }
 
