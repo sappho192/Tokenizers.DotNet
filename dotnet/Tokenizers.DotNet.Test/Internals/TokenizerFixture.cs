@@ -54,13 +54,7 @@ public sealed class TokenizerFixture : IAsyncLifetime
         }
         finally
         {
-            try
-            {
-                Lock.Release();
-            }
-            catch (SemaphoreFullException)
-            {
-            }
+            Lock.Release();
         }
     }
 
