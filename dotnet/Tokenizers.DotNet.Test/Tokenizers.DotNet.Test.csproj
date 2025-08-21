@@ -11,13 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="hf_tokenizers.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="hf_tokenizers.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+	<Content Include="../../rust/target/release/hf_tokenizers.dll">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>
