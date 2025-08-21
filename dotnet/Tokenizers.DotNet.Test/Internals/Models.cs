@@ -14,7 +14,7 @@ internal static class Models
             {
                 ModelId.KoGpt2 => "skt/kogpt2-base-v2",
                 ModelId.OaiGpt2 => "openai-community/gpt2",
-                _ => throw new ArgumentOutOfRangeException(nameof(id), id, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(id), id, "Invalid model ID.")
             };
 
             return Path.Combine(ModelPath, modelName, FileName);
