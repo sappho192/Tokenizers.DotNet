@@ -23,48 +23,55 @@ public class ThreadSafetyTests
         uint[] expected = [13612, 440, 441];
         const string Reference = "abc";
         var tokenizer = _model.GetTokenizer(ModelId.KoGpt2);
-
-        var stopwatch = new Stopwatch();
         var exceptions = new ConcurrentBag<Exception>();
         var totalCount = 0L;
-        ExecuteInParallel();
-        _output.WriteLine($"{totalCount / stopwatch.Elapsed.TotalSeconds} encodes/s");
+        var timeToRun = TimeSpan.FromSeconds(3);
+        var runTime = ExecuteInParallel(timeToRun);
+        _output.WriteLine($"{totalCount / runTime.TotalSeconds} encodes/s");
 
-        void ExecuteInParallel()
+        TimeSpan ExecuteInParallel(TimeSpan time)
         {
             // Use the golden ratio as a multiplier to slightly overprovision threads for better parallelism.
+            // The choice of 1.618 is arbitrary and is based on a personal preference, any value between 1 and 2 will suffice.
             const double ThreadMultiplier = 1.618;
             var threads = new Thread[(int)Math.Ceiling(Environment.ProcessorCount * ThreadMultiplier)];
-            for (var i = 0; i < threads.Length; i++)
+            var stopwatch = new Stopwatch();
+            using (var cts = new CancellationTokenSource(time))
             {
-                threads[i] = new(Execute);
-            }
+                ThreadStart threadStart = () => Execute(cts.Token);
+                for (var i = 0; i < threads.Length; i++)
+                {
+                    threads[i] = new(threadStart);
+                }
 
-            stopwatch.Start();
-            foreach (var thread in threads)
-            {
-                thread.Start();
-            }
+                stopwatch.Start();
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                }
 
-            foreach (var thread in threads)
-            {
-                thread.Join();
-            }
+                foreach (var thread in threads)
+                {
+                    thread.Join();
+                }
 
-            stopwatch.Stop();
+                stopwatch.Stop();
+            }
 
             if (!exceptions.IsEmpty)
             {
                 throw new AggregateException(exceptions);
             }
+
+            return stopwatch.Elapsed;
         }
 
-        void Execute()
+        void Execute(CancellationToken cancellationToken)
         {
             try
             {
                 var count = 0L;
-                while (stopwatch.Elapsed.TotalSeconds < 3)
+                while (!cancellationToken.IsCancellationRequested)
                 {
                     Assert.Equal(expected, tokenizer.Encode(Reference));
                     ++count;
