@@ -22,10 +22,12 @@ public class ThreadSafetyTests
         var tokenizer = _model.GetTokenizer(ModelId.KoGpt2);
         var totalCount = 0L;
         var spentTime = TimeSpan.Zero;
-        const double GoldenRatio = 1.618;
+
+        // Use the golden ratio as a multiplier to slightly overprovision threads for better parallelism.
+        const double ThreadMultiplier = 1.618;
         Parallel.ForEach(
             new TimeIterator(TimeSpan.FromSeconds(3)),
-            new() { MaxDegreeOfParallelism = (int)Math.Ceiling(Environment.ProcessorCount * GoldenRatio) },
+            new() { MaxDegreeOfParallelism = (int)Math.Ceiling(Environment.ProcessorCount * ThreadMultiplier) },
             () => (Count: 0, Time: TimeSpan.Zero),
             (time, _, local) =>
             {
