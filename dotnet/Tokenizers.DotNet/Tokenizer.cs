@@ -3,9 +3,8 @@ using System.Text;
 
 namespace Tokenizers.DotNet
 {
-    public class Tokenizer
+    public sealed class Tokenizer
     {
-        private Tokenizer() { }
         private readonly string sessionId;
 
         /// <summary>
