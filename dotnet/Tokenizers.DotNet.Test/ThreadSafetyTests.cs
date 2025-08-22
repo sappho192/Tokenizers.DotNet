@@ -1,3 +1,6 @@
+using System.Collections.Concurrent;
+using System.Diagnostics;
+
 using Xunit.Abstractions;
 
 namespace Tokenizers.DotNet.Test;
@@ -20,25 +23,59 @@ public class ThreadSafetyTests
         uint[] expected = [13612, 440, 441];
         const string Reference = "abc";
         var tokenizer = _model.GetTokenizer(ModelId.KoGpt2);
-        var totalCount = 0L;
-        var spentTime = TimeSpan.Zero;
 
-        // Use the golden ratio as a multiplier to slightly overprovision threads for better parallelism.
-        const double ThreadMultiplier = 1.618;
-        Parallel.ForEach(
-            new TimeIterator(TimeSpan.FromSeconds(3)),
-            new() { MaxDegreeOfParallelism = (int)Math.Ceiling(Environment.ProcessorCount * ThreadMultiplier) },
-            () => (Count: 0, Time: TimeSpan.Zero),
-            (time, _, local) =>
+        var stopwatch = new Stopwatch();
+        var exceptions = new ConcurrentBag<Exception>();
+        var totalCount = 0L;
+        ExecuteInParallel();
+        _output.WriteLine($"{totalCount / stopwatch.Elapsed.TotalSeconds} encodes/s");
+
+        void ExecuteInParallel()
+        {
+            // Use the golden ratio as a multiplier to slightly overprovision threads for better parallelism.
+            const double ThreadMultiplier = 1.618;
+            var threads = new Thread[(int)Math.Ceiling(Environment.ProcessorCount * ThreadMultiplier)];
+            for (var i = 0; i < threads.Length; i++)
             {
-                Assert.Equal(expected, tokenizer.Encode(Reference));
-                return (local.Count + 1, time > local.Time ? time : local.Time);
-            },
-            local =>
+                threads[i] = new(Execute);
+            }
+
+            stopwatch.Start();
+            foreach (var thread in threads)
             {
-                totalCount += local.Count;
-                spentTime = spentTime > local.Time ? spentTime : local.Time;
-            });
-        _output.WriteLine($"{totalCount / spentTime.TotalSeconds} encodes/s");
+                thread.Start();
+            }
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+
+            stopwatch.Stop();
+
+            if (!exceptions.IsEmpty)
+            {
+                throw new AggregateException(exceptions);
+            }
+        }
+
+        void Execute()
+        {
+            try
+            {
+                var count = 0L;
+                while (stopwatch.Elapsed.TotalSeconds < 3)
+                {
+                    Assert.Equal(expected, tokenizer.Encode(Reference));
+                    ++count;
+                }
+
+                Interlocked.Add(ref totalCount, count);
+            }
+            catch (Exception exception)
+            {
+                exceptions.Add(exception);
+            }
+        }
     }
 }
