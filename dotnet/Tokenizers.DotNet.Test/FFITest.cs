@@ -24,9 +24,16 @@ namespace Tokenizers.DotNet.Test
             fixed (char* p = path)
             {
                 var tokenizerResult = NativeMethods.tokenizer_initialize((ushort*)p, path.Length);
-                Assert.Equal(TokenizerErrorCode.Success, tokenizerResult.error_code);
-                var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
-                sessionId = new string(str);
+                try
+                {
+                    Assert.Equal(TokenizerErrorCode.Success, tokenizerResult.error_code);
+                    sessionId = Encoding.UTF8.GetString(tokenizerResult.data->ptr, tokenizerResult.data->length);
+                }
+                finally
+                {
+                    NativeMethods.free_u8_string(tokenizerResult.data);
+                }
+
                 Assert.True(sessionId.Length > 0);
             }
         }

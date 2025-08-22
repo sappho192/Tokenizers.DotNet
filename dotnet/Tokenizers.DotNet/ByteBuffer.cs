@@ -1,20 +1,19 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace CsBindgen
 {
-    // C# side span utility 
-    // From https://github.com/Cysharp/csbindgen/blob/main/README.md
     partial struct ByteBuffer
     {
-        public unsafe Span<byte> AsSpan()
+        public unsafe T[] ToArray<T>()
+            where T : unmanaged
         {
-            return new Span<byte>(ptr, length);
-        }
+            var array = new T[length / Unsafe.SizeOf<T>()];
+            fixed (void* arrayPtr = array)
+            {
+                Unsafe.CopyBlock(arrayPtr, ptr, unchecked((uint)length));
+            }
 
-        public unsafe Span<T> AsSpan<T>()
-        {
-            return MemoryMarshal.CreateSpan(ref Unsafe.AsRef<T>(ptr), length / Unsafe.SizeOf<T>());
+            return array;
         }
     }
 }

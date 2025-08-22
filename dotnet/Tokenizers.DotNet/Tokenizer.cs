@@ -21,8 +21,14 @@ namespace Tokenizers.DotNet
                     var tokenizerResult = NativeMethods.tokenizer_initialize((ushort*)p, vocabPath.Length);
                     if (tokenizerResult.error_code == 0)
                     {
-                        var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
-                        sessionId = new string(str);
+                        try
+                        {
+                            sessionId = Encoding.UTF8.GetString(tokenizerResult.data->ptr, tokenizerResult.data->length);
+                        }
+                        finally
+                        {
+                            NativeMethods.free_u8_string(tokenizerResult.data);
+                        }
                     }
                     else
                     {
@@ -40,6 +46,7 @@ namespace Tokenizers.DotNet
         /// <exception cref="TokenizerException"></exception>
         public uint[] Encode(string text)
         {
+            uint[] result;
             unsafe
             {
                 fixed (char* p = sessionId)
@@ -49,8 +56,14 @@ namespace Tokenizers.DotNet
                         var tokenizerResult = NativeMethods.tokenizer_encode((ushort*)p, sessionId.Length, (ushort*)pt, text.Length);
                         if (tokenizerResult.error_code == 0)
                         {
-                            var tokens = tokenizerResult.data->AsSpan<uint>();
-                            return tokens.ToArray();
+                            try
+                            {
+                                result = tokenizerResult.data->ToArray<uint>();
+                            }
+                            finally
+                            {
+                                NativeMethods.free_u8_string(tokenizerResult.data);
+                            }
                         }
                         else
                         {
@@ -59,6 +72,8 @@ namespace Tokenizers.DotNet
                     }
                 }
             }
+
+            return result;
         }
 
         /// <summary>
@@ -81,9 +96,14 @@ namespace Tokenizers.DotNet
                             p, tokens.Length);
                         if (tokenizerResult.error_code == 0)
                         {
-                            var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
-                            result = new string(str);
-                            NativeMethods.free_u8_string(tokenizerResult.data);
+                            try
+                            {
+                                result = Encoding.UTF8.GetString(tokenizerResult.data->ptr, tokenizerResult.data->length);
+                            }
+                            finally
+                            {
+                                NativeMethods.free_u8_string(tokenizerResult.data);
+                            }
                         }
                         else
                         {
@@ -110,9 +130,14 @@ namespace Tokenizers.DotNet
                     var tokenizerResult = NativeMethods.get_version((ushort*)cp, sessionId.Length);
                     if (tokenizerResult.error_code == 0)
                     {
-                        var str = Encoding.UTF8.GetString(tokenizerResult.data->AsSpan());
-                        result = new string(str);
-                        NativeMethods.free_u8_string(tokenizerResult.data);
+                        try
+                        {
+                            result = Encoding.UTF8.GetString(tokenizerResult.data->ptr, tokenizerResult.data->length);
+                        }
+                        finally
+                        {
+                            NativeMethods.free_u8_string(tokenizerResult.data);
+                        }
                     }
                     else
                     {
@@ -132,8 +157,7 @@ namespace Tokenizers.DotNet
                 var errorBytes = NativeMethods.get_last_error_message();
                 try
                 {
-                    var str = Encoding.UTF8.GetString(errorBytes->AsSpan());
-                    result = new string(str);
+                    result = Encoding.UTF8.GetString(errorBytes->ptr, errorBytes->length);
                 }
                 finally
                 {
