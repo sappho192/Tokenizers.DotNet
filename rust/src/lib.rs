@@ -108,9 +108,9 @@ pub unsafe extern "C" fn csharp_to_rust_u32_array(buffer: *const u32, len: i32) 
 }
 
 // Tokenizer stuff starts here
-use once_cell::unsync::Lazy;
 use std::collections::HashMap;
 use std::fmt;
+use std::sync::{LazyLock, RwLock};
 use tokenizers::tokenizer::Tokenizer;
 use uuid::Uuid;
 
@@ -151,9 +151,11 @@ pub struct TokenizerResult {
 
 static mut LAST_ERROR_MESSAGE: String = String::new();
 
-static mut TOKENIZER_SESSION: Lazy<HashMap<String, TokenizerInfo>> = Lazy::new(|| HashMap::new());
+static TOKENIZER_SESSION: LazyLock<RwLock<HashMap<String, TokenizerInfo>>> =
+    LazyLock::new(|| RwLock::new(HashMap::new()));
 
-static mut TOKENIZER_DB: Lazy<HashMap<String, Tokenizer>> = Lazy::new(|| HashMap::new());
+static TOKENIZER_DB: LazyLock<RwLock<HashMap<String, Tokenizer>>> =
+    LazyLock::new(|| RwLock::new(HashMap::new()));
 
 #[no_mangle]
 pub unsafe extern "C" fn get_last_error_message() -> *mut ByteBuffer {
@@ -181,7 +183,7 @@ pub unsafe extern "C" fn tokenizer_initialize(
     };
 
     // Add to TOKENIZER_SESSION
-    TOKENIZER_SESSION.insert(id.clone(), info);
+    TOKENIZER_SESSION.write().unwrap().insert(id.clone(), info);
 
     // Initialize TOKENIZER_DB if not already initialized
     let tokenizer = match Tokenizer::from_file(&utf8_path) {
@@ -194,7 +196,7 @@ pub unsafe extern "C" fn tokenizer_initialize(
             };
         }
     };
-    TOKENIZER_DB.insert(id.clone(), tokenizer);
+    TOKENIZER_DB.write().unwrap().insert(id.clone(), tokenizer);
 
     let session_id = id.clone();
     TokenizerResult {
@@ -253,9 +255,9 @@ pub unsafe extern "C" fn tokenizer_encode(
         }
     };
 
-    // Retrieve the tokenizer associated with the session ID
-    let tokenizer = match TOKENIZER_DB.get(&session_id).cloned() {
-        Some(t) => t,
+    // Retrieve the tokenizer associated with the session ID and invoke it
+    let result = match TOKENIZER_DB.read().unwrap().get(&session_id) {
+        Some(t) => t.encode(text, true),
         None => {
             LAST_ERROR_MESSAGE = format!("Tokenizer for session ID '{}' not found", session_id);
             return TokenizerResult {
@@ -266,7 +268,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     };
 
     // Encode the text
-    let encoded_tokens = match tokenizer.encode(text, true) {
+    let encoded_tokens = match result {
         Ok(encoded) => encoded,
         Err(err) => {
             LAST_ERROR_MESSAGE = format!("Error encoding text: {}", err);
@@ -331,9 +333,9 @@ pub unsafe extern "C" fn tokenizer_decode(
         slice_token_ids.iter().copied().collect::<Vec<u32>>()
     };
 
-    // Retrieve the tokenizer associated with the session ID
-    let tokenizer = match TOKENIZER_DB.get(&session_id).cloned() {
-        Some(t) => t,
+    // Retrieve the tokenizer associated with the session ID and invoke it
+    let result = match TOKENIZER_DB.read().unwrap().get(&session_id) {
+        Some(t) => t.decode(&token_ids_vec, true),
         None => {
             LAST_ERROR_MESSAGE = format!("Tokenizer for session ID '{}' not found", session_id);
             return TokenizerResult {
@@ -344,7 +346,7 @@ pub unsafe extern "C" fn tokenizer_decode(
     };
 
     // Decode the tokens
-    let decoded_text = match tokenizer.decode(&token_ids_vec, true) {
+    let decoded_text = match result {
         Ok(decoded) => decoded,
         Err(err) => {
             LAST_ERROR_MESSAGE = format!("Error decoding tokens: {}", err);
@@ -387,9 +389,9 @@ pub unsafe extern "C" fn get_version(
         }
     };
 
-    // Retrieve the TokenizerInfo associated with the session ID
-    let session_info = match TOKENIZER_SESSION.get(&session_id) {
-        Some(info) => info,
+    // Retrieve the TokenizerInfo associated with the session ID and and get the version
+    let version = match TOKENIZER_SESSION.read().unwrap().get(&session_id) {
+        Some(info) => info.library_version.clone(),
         None => {
             LAST_ERROR_MESSAGE = format!("Session info for session ID '{}' not found", session_id);
             return TokenizerResult {
@@ -398,9 +400,6 @@ pub unsafe extern "C" fn get_version(
             };
         }
     };
-
-    // Get the library version from the TokenizerInfo
-    let version = session_info.library_version.clone();
 
     // Return success with version as ByteBuffer
     TokenizerResult {
@@ -430,8 +429,8 @@ pub unsafe extern "C" fn tokenizer_cleanup(
     };
 
     // Remove tokenizer and session info
-    let removed_tokenizer = TOKENIZER_DB.remove(&session_id);
-    let removed_session = TOKENIZER_SESSION.remove(&session_id);
+    let removed_tokenizer = TOKENIZER_DB.write().unwrap().remove(&session_id);
+    let removed_session = TOKENIZER_SESSION.write().unwrap().remove(&session_id);
 
     if removed_tokenizer.is_none() || removed_session.is_none() {
         LAST_ERROR_MESSAGE = format!("Session ID '{}' not found", session_id);
