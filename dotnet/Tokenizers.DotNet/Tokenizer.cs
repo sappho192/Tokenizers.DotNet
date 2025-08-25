@@ -28,6 +28,14 @@ namespace Tokenizers.DotNet
             }
         }
 
+        ~Tokenizer()
+        {
+            fixed (char* cp = sessionId)
+            {
+                NativeMethods.tokenizer_cleanup((ushort*)cp, sessionId.Length);
+            }
+        }
+
         /// <summary>
         /// Throws exception if error occured from native library.
         /// </summary>
@@ -114,6 +122,8 @@ namespace Tokenizers.DotNet
 
                 ValidateErrorCode(errorCode);
             }
+
+            GC.SuppressFinalize(this);
         }
 
         private string GetLastError()
