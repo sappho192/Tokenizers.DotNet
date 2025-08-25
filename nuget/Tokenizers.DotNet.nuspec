@@ -16,17 +16,17 @@
     <tags>tokenizers;rust;huggingface;tokenizer;gpt</tags>
     <readme>docs\README.md</readme>
     <dependencies>
-      <group targetFramework="net6.0"></group>
-      <group targetFramework="net7.0"></group>
-      <group targetFramework="net8.0"></group>
-      <group targetFramework="net9.0"></group>
+      <group targetFramework="net6.0">
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="6.1.2" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="6.1.2" exclude="Build,Analyzers" />
+      </group>
     </dependencies>
   </metadata>
   <files>
     <file src="..\README.md" target="docs\" />
     <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net6.0\**\*.*" target="lib/net6.0" />
-    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net7.0\**\*.*" target="lib/net7.0" />
-    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net8.0\**\*.*" target="lib/net8.0" />
-    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\net9.0\**\*.*" target="lib/net9.0" />
+    <file src="..\dotnet\Tokenizers.DotNet\bin\Release\netstandard2.0\**\*.*" target="lib/netstandard2.0" />
   </files>
 </package>

@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <Title>Tokenizers.DotNet</Title>
@@ -33,6 +34,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+	<!-- .NET 7 chosen as cutoff point in Condition because this package expands some functionality for .NET 6.0, future-proofing this so .NET 7+ targets won't need this dependency -->
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))"/>
   </ItemGroup>
 
   <ItemGroup>
