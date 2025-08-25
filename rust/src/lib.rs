@@ -263,7 +263,7 @@ pub unsafe extern "C" fn tokenizer_encode(
 
     // Retrieve the tokenizer associated with the session ID and invoke it
     let result = match TOKENIZER_DB.read().unwrap().get(&session_id) {
-        Some(t) => t.encode(text, true),
+        Some(t) => t.encode_fast(text, true),
         None => {
             LAST_ERROR_MESSAGE.set(format!("Tokenizer for session ID '{}' not found", session_id));
             return TokenizerResult {
@@ -286,9 +286,7 @@ pub unsafe extern "C" fn tokenizer_encode(
     };
     let token_ids = encoded_tokens
         .get_ids()
-        .iter()
-        .map(|&i| i as u32)
-        .collect::<Vec<u32>>();
+        .to_vec();
 
     // Convert the token IDs to a ByteBuffer
     TokenizerResult {
@@ -336,7 +334,7 @@ pub unsafe extern "C" fn tokenizer_decode(
         Vec::new()  // Handle empty tokens case
     } else {
         let slice_token_ids = std::slice::from_raw_parts(_token_ids, _token_ids_len as usize);
-        slice_token_ids.iter().copied().collect::<Vec<u32>>()
+        slice_token_ids.to_vec()
     };
 
     // Retrieve the tokenizer associated with the session ID and invoke it
