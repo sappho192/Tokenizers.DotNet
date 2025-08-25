@@ -30,6 +30,11 @@ namespace Tokenizers.DotNet
 
         ~Tokenizer()
         {
+            if (sessionId is null)
+            {
+                return;
+            }
+
             fixed (char* cp = sessionId)
             {
                 NativeMethods.tokenizer_cleanup((ushort*)cp, sessionId.Length);
