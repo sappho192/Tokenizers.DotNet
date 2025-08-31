@@ -6,7 +6,8 @@
   - [(1) Install the packages](#1-install-the-packages)
   - [(2) Write the code](#2-write-the-code)
 - [How to build](#how-to-build)
-  - [Cross-platform build](#cross-platform-build)
+  - [(Recommended) Cross-platform build](#recommended-cross-platform-build)
+  - [Building with local machine system](#building-with-local-machine-system)
 
 # Tokenizers.DotNet
 
@@ -27,7 +28,7 @@
 
 # Requirements
 
-- .NET 6 or above
+- .NET 6 / .NET Standard 2.0 or above
 - (Build) Latest [Rust](https://www.rust-lang.org/tools/install)
 
 # Supported functionalities
@@ -122,18 +123,7 @@ Console.ReadKey();
 
 # How to build
 
-1. Prepare following stuff:
-   1.  Rust build system (`cargo`)
-   2.  .NET build system (`dotnet 6.0, 7.0, 8.0, 9.0`)
-   3.  PowerShell (Recommend `7.4.2` or above)
-2. Bump the version number in `NATIVE_LIB_VERSION.txt`
-3. Run `build_all_clean.ps1`
-   1. To build `Tokenizers.DotNet.runtime.<OS>` only, run `build_rust.ps1`
-   2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
-
-Each build artifacts will be in `nuget` directory.  
-
-## Cross-platform build
+## (Recommended) Cross-platform build
 
 You can use Docker to compile this library for Windows x64/arm64 and Linux x64/arm64
 
@@ -152,3 +142,17 @@ $ docker run -v ./nuget:/out --rm ghcr.io/sappho192/tokenizers.dotnet:latest
 ```
 
 Built packages will be in the `nuget` folder.
+
+## Building with local machine system
+(Note that this has been confirmed only in Windows machine)  
+1. Prepare following stuff:
+   1.  Rust build system (`cargo`)
+   2.  .NET build system (`dotnet 6.0` or above)
+   3.  PowerShell (Recommend `7.4.2` or above)
+2. Bump the version number in `NATIVE_LIB_VERSION.txt`
+3. Run `build_all_clean.ps1`
+   1. To build `Tokenizers.DotNet.runtime.<OS>` only, run `build_rust.ps1`
+   2. To build `Tokenizers.DotNet` only, run `build_dotnet.ps1`
+
+Each build artifacts will be in `nuget` directory.  
+
