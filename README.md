@@ -8,6 +8,7 @@
 - [How to build](#how-to-build)
   - [(Recommended) Cross-platform build](#recommended-cross-platform-build)
   - [Building with local machine system](#building-with-local-machine-system)
+- [Release guide](#release-guide)
 
 # Tokenizers.DotNet
 
@@ -156,3 +157,17 @@ Built packages will be in the `nuget` folder.
 
 Each build artifacts will be in `nuget` directory.  
 
+# Release guide
+
+1. Run `update_version.ps1` to update the version number
+2. Commit with a new version number and add a tag. 
+New tag should be end with `-RC0`, `-RC1`, ... until final check.
+BE SURE to check following files are committed:
+- `NATIVE_LIB_VERSION.txt`
+- `Cargo.toml`
+- `Tokenizers.DotNet.nuspec`
+- `Tokenizers.DotNet.runtime.win-x64.nuspec`
+- `Tokenizers.DotNet.runtime.win-arm64.nuspec`
+- `Tokenizers.DotNet.runtime.linux-x64.nuspec`
+- `Tokenizers.DotNet.runtime.linux-arm64.nuspec`
+3. Update README.md and name a real version tag (not ending with `-RC0`, ...)
