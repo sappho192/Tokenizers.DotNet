@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 csbindgen = "1.9.5"
 
 [dependencies]
-tokenizers = { version = "0.21.4", default-features = false, features = ["onig"] }
+tokenizers = { version = "0.22.2", default-features = false, features = ["onig"] }
 uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
 mimalloc = "0.1.47"
 
