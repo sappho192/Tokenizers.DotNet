@@ -36,4 +36,6 @@ jobs:
           nuget/win-arm64/Tokenizers.DotNet.runtime.win-arm64.*.nupkg
           nuget/linux-x64/Tokenizers.DotNet.runtime.linux-x64.*.nupkg
           nuget/linux-arm64/Tokenizers.DotNet.runtime.linux-arm64.*.nupkg
+          nuget/osx-x64/Tokenizers.DotNet.runtime.osx-x64.*.nupkg
+          nuget/osx-arm64/Tokenizers.DotNet.runtime.osx-arm64.*.nupkg
           nuget/Tokenizers.DotNet.*.nupkg
