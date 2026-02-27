@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Tokenizers.DotNet.runtime.osx-arm64</id>
+    <version>1.3.0</version>
+    <title>Tokenizers.DotNet.runtime.osx-arm64</title>
+    <authors>sappho192</authors>
+    <owners>sappho192</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <!-- <icon>icon.png</icon> -->
+    <projectUrl>https://github.com/sappho192/Tokenizers.DotNet</projectUrl>
+    <repository type="git" url="https://github.com/sappho192/Tokenizers.DotNet.git" branch="$RepositoryBranch$" commit="$RepositoryCommit$" />
+    <description>Native(Rust) wrapper of HuggingFace Tokenizers library.</description>
+    <copyright>Copyright (c) Taein Kim(sappho192)</copyright>
+    <tags>tokenizers;rust;huggingface;tokenizer;gpt</tags>
+  </metadata>
+  <files>
+    <file src="libhf_tokenizers.dylib" target="runtimes\osx-arm64\native" />
+  </files>
+</package>

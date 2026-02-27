@@ -74,6 +74,40 @@ ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc \
     CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
 RUN cargo build --target aarch64-unknown-linux-gnu --release
 
+# macOS X64
+FROM rust AS osxx64
+
+RUN cargo install cargo-zigbuild
+RUN apt-get update && \
+    apt-get install -qqy --no-install-recommends python3 && \
+    pip3 install --break-system-packages ziglang
+
+RUN rustup target add x86_64-apple-darwin
+
+WORKDIR /src
+
+COPY . .
+
+WORKDIR /src/rust
+RUN cargo zigbuild --target x86_64-apple-darwin --release
+
+# macOS ARM64
+FROM rust AS osxarm64
+
+RUN cargo install cargo-zigbuild
+RUN apt-get update && \
+    apt-get install -qqy --no-install-recommends python3 && \
+    pip3 install --break-system-packages ziglang
+
+RUN rustup target add aarch64-apple-darwin
+
+WORKDIR /src
+
+COPY . .
+
+WORKDIR /src/rust
+RUN cargo zigbuild --target aarch64-apple-darwin --release
+
 FROM rust
 
 WORKDIR /src
@@ -106,6 +140,8 @@ COPY --from=winx64 /src/rust/target/x86_64-pc-windows-gnu/release/hf_tokenizers.
 COPY --from=winarm64 /src/rust/target/aarch64-pc-windows-gnullvm/release/hf_tokenizers.dll /src/nuget/win-arm64/hf_tokenizers.dll
 COPY --from=linuxx64 /src/rust/target/x86_64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-x64/libhf_tokenizers.so
 COPY --from=linuxarm64 /src/rust/target/aarch64-unknown-linux-gnu/release/libhf_tokenizers.so /src/nuget/linux-arm64/libhf_tokenizers.so
+COPY --from=osxx64 /src/rust/target/x86_64-apple-darwin/release/libhf_tokenizers.dylib /src/nuget/osx-x64/libhf_tokenizers.dylib
+COPY --from=osxarm64 /src/rust/target/aarch64-apple-darwin/release/libhf_tokenizers.dylib /src/nuget/osx-arm64/libhf_tokenizers.dylib
 
 # Build
 RUN dos2unix build_dotnet.ps1
