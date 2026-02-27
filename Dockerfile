@@ -79,7 +79,7 @@ FROM rust AS osxx64
 
 RUN cargo install cargo-zigbuild
 RUN apt-get update && \
-    apt-get install -qqy --no-install-recommends python3 && \
+    apt-get install -qqy --no-install-recommends python3 python3-pip && \
     pip3 install --break-system-packages ziglang
 
 RUN rustup target add x86_64-apple-darwin
@@ -89,6 +89,16 @@ WORKDIR /src
 COPY . .
 
 WORKDIR /src/rust
+# libmimalloc-sys 0.1.44+ unconditionally includes <CommonCrypto/CommonCryptoError.h>
+# when __APPLE__ is defined, but zig's cross-compilation sysroot lacks macOS framework headers.
+# Provide minimal stubs so C code compiles; CCRandomGenerateBytes returns failure so
+# mimalloc falls back to /dev/urandom for random seed initialization at runtime.
+RUN mkdir -p /usr/local/include/CommonCrypto && \
+    printf '#pragma once\n#include <stdint.h>\n#include <stddef.h>\ntypedef int32_t CCCryptorStatus;\ntypedef CCCryptorStatus CCRNGStatus;\nenum { kCCSuccess = 0 };\nstatic inline CCRNGStatus CCRandomGenerateBytes(void* b, size_t n) { return -1; }\n' \
+    > /usr/local/include/CommonCrypto/CommonCryptoError.h && \
+    printf '#pragma once\n#include <CommonCrypto/CommonCryptoError.h>\n' \
+    > /usr/local/include/CommonCrypto/CommonRandom.h
+ENV CFLAGS_x86_64_apple_darwin="-I/usr/local/include"
 RUN cargo zigbuild --target x86_64-apple-darwin --release
 
 # macOS ARM64
@@ -96,7 +106,7 @@ FROM rust AS osxarm64
 
 RUN cargo install cargo-zigbuild
 RUN apt-get update && \
-    apt-get install -qqy --no-install-recommends python3 && \
+    apt-get install -qqy --no-install-recommends python3 python3-pip && \
     pip3 install --break-system-packages ziglang
 
 RUN rustup target add aarch64-apple-darwin
@@ -106,6 +116,12 @@ WORKDIR /src
 COPY . .
 
 WORKDIR /src/rust
+RUN mkdir -p /usr/local/include/CommonCrypto && \
+    printf '#pragma once\n#include <stdint.h>\n#include <stddef.h>\ntypedef int32_t CCCryptorStatus;\ntypedef CCCryptorStatus CCRNGStatus;\nenum { kCCSuccess = 0 };\nstatic inline CCRNGStatus CCRandomGenerateBytes(void* b, size_t n) { return -1; }\n' \
+    > /usr/local/include/CommonCrypto/CommonCryptoError.h && \
+    printf '#pragma once\n#include <CommonCrypto/CommonCryptoError.h>\n' \
+    > /usr/local/include/CommonCrypto/CommonRandom.h
+ENV CFLAGS_aarch64_apple_darwin="-I/usr/local/include"
 RUN cargo zigbuild --target aarch64-apple-darwin --release
 
 FROM rust
