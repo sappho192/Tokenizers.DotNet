@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Tokenizers.DotNet.runtime.win-arm64</id>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
     <title>Tokenizers.DotNet.runtime.win-arm64</title>
     <authors>sappho192</authors>
     <owners>sappho192</owners>

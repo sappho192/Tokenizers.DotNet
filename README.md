@@ -26,6 +26,8 @@
 | Tokenizers.DotNet.runtime.win-arm64 | [![Nuget Tokenizers.DotNet.runtime.win-arm64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.win-arm64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.win-arm64/) | Native bindings for windows arm64 |
 | Tokenizers.DotNet.runtime.linux-x64 | [![Nuget Tokenizers.DotNet.runtime.linux-x64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.linux-x64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.linux-x64/) | Native bindings for linux x64 |
 | Tokenizers.DotNet.runtime.linux-arm64 | [![Nuget Tokenizers.DotNet.runtime.linux-arm64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.linux-arm64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.linux-arm64/) | Native bindings for linux arm64 |
+| Tokenizers.DotNet.runtime.osx-x64 | [![Nuget Tokenizers.DotNet.runtime.osx-x64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.osx-x64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.osx-64/) | Native bindings for macOS x64 |
+| Tokenizers.DotNet.runtime.osx-arm64 | [![Nuget Tokenizers.DotNet.runtime.osx-arm64](https://img.shields.io/nuget/v/Tokenizers.DotNet.runtime.osx-arm64.svg?style=flat)](https://www.nuget.org/packages/Tokenizers.DotNet.runtime.osx-arm64/) | Native bindings for macOS arm64 |
 
 # Requirements
 
