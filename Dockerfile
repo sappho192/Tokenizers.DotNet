@@ -45,6 +45,12 @@ RUN cargo build --target aarch64-pc-windows-gnullvm --release
 # Linux X64
 FROM rust AS linuxx64
 
+# Install cross-compilation tools when building on non-x86_64 hosts (e.g., ARM64)
+RUN if [ "$(dpkg --print-architecture)" != "amd64" ]; then \
+      apt-get update && \
+      apt-get install -qqy --no-install-recommends gcc-x86-64-linux-gnu g++-x86-64-linux-gnu libc6-dev-amd64-cross; \
+    fi
+
 RUN rustup target add x86_64-unknown-linux-gnu
 
 WORKDIR /src
@@ -52,17 +58,22 @@ WORKDIR /src
 COPY . .
 
 WORKDIR /src/rust
+ENV CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-linux-gnu-gcc \
+    CC_x86_64_unknown_linux_gnu=x86_64-linux-gnu-gcc \
+    CXX_x86_64_unknown_linux_gnu=x86_64-linux-gnu-g++
 RUN cargo build --target x86_64-unknown-linux-gnu --release
 
 # Linux ARM64
 FROM rust AS linuxarm64
 
-RUN apt-get update && \
-    apt-get purge -y g++ && \
-    apt-get install -qqy --no-install-recommends g++-aarch64-linux-gnu libc6-dev-arm64-cross
+# Install cross-compilation tools when building on non-ARM64 hosts (e.g., x86_64)
+RUN if [ "$(dpkg --print-architecture)" != "arm64" ]; then \
+      apt-get update && \
+      apt-get purge -y g++ && \
+      apt-get install -qqy --no-install-recommends g++-aarch64-linux-gnu libc6-dev-arm64-cross; \
+    fi
 
 RUN rustup target add aarch64-unknown-linux-gnu
-#RUN rustup toolchain install stable-aarch64-unknown-linux-gnu
 
 WORKDIR /src
 
@@ -128,22 +139,25 @@ FROM rust
 
 WORKDIR /src
 
-# Prepare powershell
 SHELL ["/bin/bash", "-c"]
-RUN apt-get update && \
-    apt-get install -y wget && \
-    source /etc/os-release && \
-    wget -q https://packages.microsoft.com/config/debian/$VERSION_ID/packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb
 
-# Install nuget + dotnet and powershell
+# Install nuget + dotnet
 RUN apt-get update && \
-    apt-get install -y nuget mono-complete dos2unix powershell && \
+    apt-get install -y nuget mono-complete dos2unix && \
     wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && \
     chmod +x ./dotnet-install.sh && \
     ./dotnet-install.sh --channel 9.0 && \
     nuget update -self
+
+# Install PowerShell from GitHub release (no longer available via apt on Debian 12)
+ARG PS_VERSION=7.4.7
+RUN PS_ARCH=$(dpkg --print-architecture | sed 's/amd64/x64/' | sed 's/arm64/arm64/') && \
+    wget -q https://github.com/PowerShell/PowerShell/releases/download/v${PS_VERSION}/powershell-${PS_VERSION}-linux-${PS_ARCH}.tar.gz -O /tmp/powershell.tar.gz && \
+    mkdir -p /opt/microsoft/powershell/7 && \
+    tar zxf /tmp/powershell.tar.gz -C /opt/microsoft/powershell/7 && \
+    chmod +x /opt/microsoft/powershell/7/pwsh && \
+    ln -s /opt/microsoft/powershell/7/pwsh /usr/bin/pwsh && \
+    rm /tmp/powershell.tar.gz
 
 ENV PATH=$PATH:/root/.dotnet
 
