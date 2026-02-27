@@ -1,5 +1,5 @@
 ﻿# https://github.com/mstorsjo/llvm-mingw
-ARG RUST_VERSION=1.85.0
+ARG RUST_VERSION=1.93.1
 
 FROM rust:${RUST_VERSION}-bookworm AS rust
 
