@@ -33,6 +33,7 @@
 
 - .NET 6 / .NET Standard 2.0 or above
 - (Build) Latest [Rust](https://www.rust-lang.org/tools/install)
+- `Tokenizers.DotNet` managed assembly is strong-name signed. This changes the assembly identity from earlier unsigned releases, so upgrading consumers may need to rebuild.
 
 # Supported functionalities
 
