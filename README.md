@@ -174,4 +174,4 @@ BE SURE to check following files are committed:
 - `Tokenizers.DotNet.runtime.win-arm64.nuspec`
 - `Tokenizers.DotNet.runtime.linux-x64.nuspec`
 - `Tokenizers.DotNet.runtime.linux-arm64.nuspec`
-3. Update README.md and name a real version tag (not ending with `-RC0`, ...)
+3. **Update README.md and name a real version tag** (not ending with `-RC0`, ...)
