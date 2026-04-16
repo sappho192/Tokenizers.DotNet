@@ -162,6 +162,7 @@ Each build artifacts will be in `nuget` directory.
 
 # Release guide
 
+0. Change the version number in `NATIVE_LIB_VERSION.txt`
 1. Run `update_version.ps1` to update the version number
 2. Commit with a new version number and add a tag. 
 New tag should be end with `-RC0`, `-RC1`, ... until final check.
